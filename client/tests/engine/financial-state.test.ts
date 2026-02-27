@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { computeDerived } from '../../src/stores/financial-state';
 import type { FinancialState, PayGrade } from '@fortress/types';
 

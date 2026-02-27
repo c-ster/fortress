@@ -56,10 +56,10 @@ describe('MFA service', () => {
     expect(uri).toContain('Fortress');
   });
 
-  it('verifies a valid TOTP token', () => {
+  it('verifies a valid TOTP token', async () => {
     const { secret } = generateMfaSecret();
     // Generate a current valid token using the same library
-    const OTPAuth = require('otpauth');
+    const OTPAuth = await import('otpauth');
     const totp = new OTPAuth.TOTP({
       issuer: 'Fortress',
       label: 'Fortress Financial',
