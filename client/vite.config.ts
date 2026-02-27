@@ -4,6 +4,9 @@ import path from 'path';
 
 export default defineConfig({
   plugins: [react()],
+  worker: {
+    format: 'es',
+  },
   resolve: {
     alias: {
       '@fortress/types': path.resolve(__dirname, '../packages/types/src'),

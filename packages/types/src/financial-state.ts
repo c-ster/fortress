@@ -102,3 +102,28 @@ export interface FinancialState {
 
   actionStatuses: Record<string, 'pending' | 'completed' | 'skipped' | 'deferred'>;
 }
+
+// --- LES OCR types ---
+
+export interface LESFieldResult {
+  field: string;
+  value: number;
+  confidence: number;
+  source: 'text_layer' | 'ocr';
+  rawMatch: string;
+}
+
+export interface LESParseResult {
+  fields: LESFieldResult[];
+  rawText: string;
+  extractionMethod: 'text_layer' | 'ocr';
+  pageCount: number;
+}
+
+export type LESProgressStage = 'loading' | 'rendering' | 'ocr' | 'extracting' | 'done' | 'error';
+
+export interface LESProgress {
+  stage: LESProgressStage;
+  percent: number;
+  message: string;
+}

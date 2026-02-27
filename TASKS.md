@@ -243,7 +243,7 @@
 
 ### 1.1 LES OCR Parsing
 
-- [ ] **1.1.1 PDF.js + Tesseract.js in Web Worker**
+- [x] **1.1.1 PDF.js + Tesseract.js in Web Worker**
   - Web Worker: loads PDF.js, renders page to canvas at 300 DPI, runs Tesseract.js WASM OCR.
   - Main thread API: `parseLES(file: File): Promise<LESParseResult>`.
   - PDF binary stays in Worker memory — never posted back to main thread, never persisted.
@@ -252,7 +252,7 @@
   - **Test:** Given sample LES PDF -> returns raw OCR text. Worker doesn't block UI. PDF data absent from main thread memory after parse. < 15s on sample PDF.
   - **Depends on:** 0.1.1
 
-- [ ] **1.1.2 Field extraction templates**
+- [x] **1.1.2 Field extraction templates**
   - Template registry: `LESFieldTemplate[]` with regex patterns per field.
   - Fields: basePay, bah, bas, cola, allotments, tspContribution, sgli, federalTax, stateTax, fica.
   - Multiple regex variants per field for format differences.
@@ -262,7 +262,7 @@
   - **Test:** Correct extraction from at least 2 different LES text formats. Confidence scores reflect quality. Out-of-range values get low confidence.
   - **Depends on:** 1.1.1
 
-- [ ] **1.1.3 LES upload UI with confirmation**
+- [x] **1.1.3 LES upload UI with confirmation**
   - Drag-and-drop upload zone (click-to-select fallback).
   - Progress indicator during OCR.
   - Confirmation screen: form with extracted values. Per-field confidence badge (green >=90%, yellow 70-89%, red <70%). User can edit any field.
@@ -272,7 +272,7 @@
   - **Test:** Full upload -> confirm flow. Low-confidence fields highlighted. Edits persist. Error states handled gracefully.
   - **Depends on:** 1.1.2, 0.3.1
 
-- [ ] **1.1.4 Hybrid data source tracking**
+- [x] **1.1.4 Hybrid data source tracking**
   - FSM `meta.dataSource` updates to `'hybrid'` when both OCR and manual data present.
   - Per-field confidence tracks source (ocr vs manual).
   - Conflict resolution: if OCR value differs from existing manual value, prompt user to choose.

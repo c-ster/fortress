@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { FinancialState, Debt, Allotment, PayGrade } from '@fortress/types';
+import type { FinancialState, Debt, Allotment, PayGrade, LESFieldResult } from '@fortress/types';
 
 function defaultState(): FinancialState {
   return {
@@ -127,6 +127,7 @@ interface FinancialStateStore {
   removeAllotment: (id: string) => void;
   setPaydaySpikeSeverity: (severity: number) => void;
   setActionStatus: (actionId: string, status: 'pending' | 'completed' | 'skipped' | 'deferred') => void;
+  applyLESData: (fields: LESFieldResult[]) => void;
   hydrate: (state: FinancialState) => void;
   reset: () => void;
 }
@@ -229,6 +230,53 @@ export const useFinancialStore = create<FinancialStateStore>((set) => ({
         actionStatuses: { ...store.state.actionStatuses, [actionId]: status },
       }),
     })),
+
+  applyLESData: (fields) =>
+    set((store) => {
+      const incomeUpdates: Partial<FinancialState['income']> = {};
+      const deductionUpdates: Partial<FinancialState['deductions']> = {};
+      const confidenceScores: Record<string, number> = { ...store.state.meta.confidenceScores };
+
+      for (const field of fields) {
+        confidenceScores[field.field] = field.confidence;
+
+        switch (field.field) {
+          case 'basePay': incomeUpdates.basePay = field.value; break;
+          case 'bah': incomeUpdates.bah = field.value; break;
+          case 'bas': incomeUpdates.bas = field.value; break;
+          case 'cola': incomeUpdates.cola = field.value; break;
+          case 'federalTax': deductionUpdates.federalTax = field.value; break;
+          case 'stateTax': deductionUpdates.stateTax = field.value; break;
+          case 'fica': deductionUpdates.fica = field.value; break;
+          case 'sgli':
+            deductionUpdates.sgli = field.value;
+            // Reverse-lookup SGLI coverage: ~$6/mo per $50K coverage
+            deductionUpdates.sgliCoverage = Math.round(field.value / 6) * 50000;
+            break;
+          case 'tspContribution':
+            deductionUpdates.tspTraditional = field.value;
+            break;
+        }
+      }
+
+      // Determine data source: hybrid if manual data already exists
+      const hadManualData = store.state.meta.dataSource === 'manual' &&
+        store.state.meta.completeness > 0;
+      const dataSource = hadManualData ? 'hybrid' : 'les_ocr';
+
+      return {
+        state: computeDerived({
+          ...store.state,
+          income: { ...store.state.income, ...incomeUpdates },
+          deductions: { ...store.state.deductions, ...deductionUpdates },
+          meta: {
+            ...store.state.meta,
+            dataSource: dataSource as FinancialState['meta']['dataSource'],
+            confidenceScores,
+          },
+        }),
+      };
+    }),
 
   hydrate: (newState) => set({ state: computeDerived(newState) }),
 
