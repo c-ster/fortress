@@ -36,6 +36,7 @@ function defaultState(): FinancialState {
       dataSource: 'manual', lastUpdated: new Date().toISOString(),
       completeness: 0, confidenceScores: {},
     },
+    actionStatuses: {},
   };
 }
 
@@ -125,6 +126,7 @@ interface FinancialStateStore {
   addAllotment: (allotment: Allotment) => void;
   removeAllotment: (id: string) => void;
   setPaydaySpikeSeverity: (severity: number) => void;
+  setActionStatus: (actionId: string, status: 'pending' | 'completed' | 'skipped' | 'deferred') => void;
   hydrate: (state: FinancialState) => void;
   reset: () => void;
 }
@@ -217,6 +219,14 @@ export const useFinancialStore = create<FinancialStateStore>((set) => ({
       state: computeDerived({
         ...store.state,
         risk: { ...store.state.risk, paydaySpikeSeverity: severity },
+      }),
+    })),
+
+  setActionStatus: (actionId, status) =>
+    set((store) => ({
+      state: computeDerived({
+        ...store.state,
+        actionStatuses: { ...store.state.actionStatuses, [actionId]: status },
       }),
     })),
 

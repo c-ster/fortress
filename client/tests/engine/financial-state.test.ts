@@ -36,6 +36,7 @@ function makeState(overrides: Record<string, unknown> = {}): FinancialState {
     meta: {
       dataSource: 'manual', lastUpdated: '', completeness: 0, confidenceScores: {},
     },
+    actionStatuses: {},
   };
 
   // Apply deep overrides

@@ -46,6 +46,7 @@ function makeState(): FinancialState {
       dataSource: 'manual', lastUpdated: '2025-01-15T12:00:00Z',
       completeness: 0.9, confidenceScores: {},
     },
+    actionStatuses: {},
   };
 }
 

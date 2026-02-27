@@ -48,6 +48,11 @@ export async function decryptAndHydrate(
     );
   }
 
+  // Backward compat: old snapshots may lack actionStatuses
+  if (!('actionStatuses' in obj)) {
+    obj.actionStatuses = {};
+  }
+
   const state = parsed as FinancialState;
   useFinancialStore.getState().hydrate(state);
   return state;

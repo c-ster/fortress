@@ -99,4 +99,6 @@ export interface FinancialState {
     completeness: number;
     confidenceScores: Record<string, number>;
   };
+
+  actionStatuses: Record<string, 'pending' | 'completed' | 'skipped' | 'deferred'>;
 }

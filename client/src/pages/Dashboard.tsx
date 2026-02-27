@@ -1,9 +1,12 @@
-import { useMemo } from 'react';
+import { useMemo, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useFinancialStore } from '../stores/financial-state';
 import { calculateRiskScore } from '../engine/risk-engine';
+import { generateActionPlan, ACTION_PLAN_DISCLAIMER } from '../engine/action-generator';
 import { RiskScore } from '../components/dashboard/RiskScore';
 import { FindingCard } from '../components/dashboard/FindingCard';
+import { ActionCard } from '../components/dashboard/ActionCard';
+import type { Action } from '@fortress/types';
 
 function DataQualityBanner({ completeness }: { completeness: number }) {
   return (
@@ -31,8 +34,32 @@ function DataQualityBanner({ completeness }: { completeness: number }) {
 }
 
 export function Dashboard() {
-  const { state } = useFinancialStore();
+  const { state, setActionStatus } = useFinancialStore();
   const assessment = useMemo(() => calculateRiskScore(state), [state]);
+  const actionPlan = useMemo(
+    () => generateActionPlan(state, assessment),
+    [state, assessment],
+  );
+
+  const handleStatusChange = useCallback(
+    (actionId: string, status: Action['status']) => {
+      setActionStatus(actionId, status);
+    },
+    [setActionStatus],
+  );
+
+  // Resolve effective status: overlay persisted statuses onto generated actions
+  const allActions = actionPlan.immediate;
+  const resolvedActions = allActions.map((action) => ({
+    ...action,
+    status: state.actionStatuses[action.id] ?? action.status,
+  }));
+  const activeActions = resolvedActions.filter(
+    (a) => a.status === 'pending' || a.status === 'deferred',
+  );
+  const completedActions = resolvedActions.filter(
+    (a) => a.status === 'completed' || a.status === 'skipped',
+  );
 
   return (
     <div>
@@ -73,6 +100,58 @@ export function Dashboard() {
           </div>
         )}
       </section>
+
+      {/* Action Plan Section */}
+      {allActions.length > 0 && (
+        <section className="mt-8">
+          <h3 className="text-lg font-semibold text-fortress-navy mb-1">
+            Action Plan{' '}
+            <span className="text-sm font-normal text-gray-400">
+              ({activeActions.length} remaining)
+            </span>
+          </h3>
+          <p className="text-sm text-gray-500 mb-4">
+            Quick wins to improve your financial readiness this week.
+          </p>
+
+          {/* Active actions */}
+          <div className="space-y-3">
+            {activeActions.map((action) => (
+              <ActionCard
+                key={action.id}
+                action={action}
+                onStatusChange={handleStatusChange}
+              />
+            ))}
+          </div>
+
+          {/* Completed / Skipped actions */}
+          {completedActions.length > 0 && (
+            <div className="mt-4">
+              <p className="text-xs text-gray-400 font-medium uppercase tracking-wider mb-2">
+                Completed / Skipped ({completedActions.length})
+              </p>
+              <div className="space-y-2">
+                {completedActions.map((action) => (
+                  <ActionCard
+                    key={action.id}
+                    action={action}
+                    onStatusChange={handleStatusChange}
+                    muted
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Disclaimer — always visible */}
+          <div className="mt-6 p-3 bg-gray-50 border border-gray-200 rounded-md">
+            <p className="text-xs text-gray-500 leading-relaxed">
+              {ACTION_PLAN_DISCLAIMER}
+            </p>
+          </div>
+        </section>
+      )}
 
       <div className="mt-8 flex gap-3">
         <Link

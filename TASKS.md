@@ -197,7 +197,7 @@
 
 ### 0.5 Action Plan (MVP)
 
-- [ ] **0.5.1 Action generator — immediate tier**
+- [x] **0.5.1 Action generator — immediate tier**
   - Pure function in `client/src/engine/action-generator.ts`:
     `generateActionPlan(state: FinancialState, risk: RiskAssessment): ActionPlan`
   - Types in `packages/types/src/actions.ts`: `ActionPlan`, `Action`.
@@ -226,7 +226,7 @@
     - All actions have non-empty mechanism field with specific steps.
   - **Depends on:** 0.4.1
 
-- [ ] **0.5.2 Action plan UI with status tracking**
+- [x] **0.5.2 Action plan UI with status tracking**
   - Section on dashboard below risk score.
   - Action cards: title, description, mechanism, amount, deadline, impact, difficulty badge, time estimate.
   - Status buttons per action: "Done" / "Skip" / "Later".
