@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import { useIntakeWizard } from '../../hooks/useIntakeWizard';
 import { StepIndicator } from '../shared/StepIndicator';
 import { NavigationButtons } from '../shared/NavigationButtons';
@@ -77,9 +78,17 @@ export function IntakeWizard() {
       {/* Success banner */}
       {saveSuccess && (
         <div className="bg-green-50 border border-fortress-green/30 rounded-md px-4 py-3
-          text-sm text-green-800 flex items-center gap-2">
-          <span className="text-fortress-green font-bold">&#10003;</span>
-          Data encrypted and saved successfully.
+          text-sm text-green-800 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-fortress-green font-bold">&#10003;</span>
+            Data encrypted and saved successfully.
+          </div>
+          <Link
+            to="/dashboard"
+            className="text-fortress-navy font-medium hover:underline text-sm"
+          >
+            View Results &rarr;
+          </Link>
         </div>
       )}
 

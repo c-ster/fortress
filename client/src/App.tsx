@@ -6,6 +6,7 @@ import { RegisterPage } from './components/auth/RegisterPage';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { useAuthStore } from './stores/auth';
 import { useBahPrefetch } from './hooks/useBahPrefetch';
+import { Dashboard } from './pages/Dashboard';
 
 function Header() {
   const { isAuthenticated, user, logout } = useAuthStore();
@@ -26,6 +27,12 @@ function Header() {
         <nav className="flex items-center gap-4">
           {isAuthenticated ? (
             <>
+              <Link
+                to="/dashboard"
+                className="text-sm text-gray-300 hover:text-white transition-colors"
+              >
+                Dashboard
+              </Link>
               <span className="text-sm text-gray-300 hidden sm:block">
                 {user?.email}
               </span>
@@ -76,13 +83,23 @@ export function App() {
                   Secure financial planning for service members and their families. Get to 80%
                   financial readiness in under 30 minutes.
                 </p>
-                <Link
-                  to="/intake"
-                  className="bg-fortress-navy text-white px-8 py-3 rounded-md font-medium
-                    hover:bg-fortress-navy/90 transition-colors inline-block"
-                >
-                  Start Financial Intake
-                </Link>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <Link
+                    to="/intake"
+                    className="bg-fortress-navy text-white px-8 py-3 rounded-md font-medium
+                      hover:bg-fortress-navy/90 transition-colors inline-block"
+                  >
+                    Start Financial Intake
+                  </Link>
+                  <Link
+                    to="/dashboard"
+                    className="border border-fortress-navy text-fortress-navy px-8 py-3
+                      rounded-md font-medium hover:bg-fortress-navy/10 transition-colors
+                      inline-block"
+                  >
+                    View Results
+                  </Link>
+                </div>
               </div>
             }
           />
@@ -93,6 +110,14 @@ export function App() {
             element={
               <ProtectedRoute>
                 <IntakePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
               </ProtectedRoute>
             }
           />

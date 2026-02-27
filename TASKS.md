@@ -161,7 +161,7 @@
 
 ### 0.4 Risk Engine (MVP)
 
-- [ ] **0.4.1 Risk engine — 3 rules**
+- [x] **0.4.1 Risk engine — 3 rules**
   - Pure function in `client/src/engine/risk-engine.ts`:
     `calculateRiskScore(state: FinancialState): RiskAssessment`
   - Types in `packages/types/src/risk.ts`: `RiskAssessment`, `RiskFinding`, `RiskCategory`.
@@ -184,7 +184,7 @@
     - No debts at all -> high-interest debt rule scores 0 deducted.
   - **Depends on:** 0.3.1
 
-- [ ] **0.4.2 Risk score UI**
+- [x] **0.4.2 Risk score UI**
   - Dashboard page: `client/src/pages/Dashboard.tsx`.
   - Large risk score number + tier color ring/badge.
   - Findings list: cards with title, description, impact, severity badge.
