@@ -38,6 +38,7 @@ export const encryptedSnapshots = financialSchema.table('encrypted_snapshots', {
   id: uuid('id').primaryKey().defaultRandom(),
   userId: uuid('user_id')
     .notNull()
+    .unique()
     .references(() => users.id, { onDelete: 'cascade' }),
   ciphertext: bytea('ciphertext').notNull(),
   iv: bytea('iv').notNull(),

@@ -4,6 +4,7 @@ import cookie from '@fastify/cookie';
 import { config } from './config.js';
 import { registerRateLimit } from './middleware/rate-limit.js';
 import { authRoutes } from './routes/auth.js';
+import { financialRoutes } from './routes/financial.js';
 
 const app = Fastify({
   logger: config.isDev
@@ -22,6 +23,7 @@ await registerRateLimit(app);
 app.get('/health', async () => ({ status: 'ok', env: config.env }));
 
 await app.register(authRoutes);
+await app.register(financialRoutes);
 
 try {
   await app.listen({ port: config.port, host: '0.0.0.0' });
