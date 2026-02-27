@@ -14,6 +14,7 @@ export async function saveSnapshot(
       'Content-Type': 'application/json',
       Authorization: `Bearer ${accessToken}`,
     },
+    credentials: 'include',
     body: JSON.stringify(payload),
   });
 
@@ -36,6 +37,7 @@ export async function loadSnapshot(
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
+    credentials: 'include',
   });
 
   if (response.status === 404) {
