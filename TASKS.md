@@ -148,7 +148,7 @@
   - **Test:** Modify FSM -> wait 5s -> snapshot appears in DB. Reload app -> state restored. Delete -> state gone. Verify network payloads contain only encrypted data (no plaintext).
   - **Depends on:** 0.1.4, 0.3.4, 0.2.1
 
-- [ ] **0.3.6 Full BAH table (lazy-loaded)**
+- [x] **0.3.6 Full BAH table (lazy-loaded)**
   - Server route: `GET /tables/bah/:year` returns full BAH JSON (~400KB gzipped).
   - `GET /tables/version` returns hash/version for cache invalidation.
   - Client: lazy-load after app shell interactive. Store in IndexedDB. Version-check on app start.

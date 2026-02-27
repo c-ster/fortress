@@ -1,0 +1,1695 @@
+{
+  "meta": {
+    "year": 2025,
+    "effectiveDate": "2025-01-01",
+    "source": "DoD 2025 Basic Allowance for Housing rates (DFAS)",
+    "notes": "E5 BAH rates in USD by ZIP code. 'with' = with dependents, 'without' = without dependents. Non-taxable. Covers all Military Housing Areas (MHAs).",
+    "baselineGrade": "E5",
+    "totalEntries": 300
+  },
+  "96860": {
+    "installation": "JB Pearl Harbor-Hickam",
+    "with": 3513,
+    "without": 2682
+  },
+  "96813": {
+    "installation": "Honolulu / Tripler AMC",
+    "with": 3513,
+    "without": 2682
+  },
+  "96701": {
+    "installation": "Aiea / Pearl City",
+    "with": 3513,
+    "without": 2682
+  },
+  "96734": {
+    "installation": "Kailua / MCBH Kaneohe Bay",
+    "with": 3513,
+    "without": 2682
+  },
+  "96786": {
+    "installation": "Wahiawa / Schofield Barracks",
+    "with": 3513,
+    "without": 2682
+  },
+  "96857": {
+    "installation": "Hickam AFB",
+    "with": 3513,
+    "without": 2682
+  },
+  "92101": {
+    "installation": "Naval Base San Diego",
+    "with": 3987,
+    "without": 3132
+  },
+  "92055": {
+    "installation": "Camp Pendleton",
+    "with": 3921,
+    "without": 3084
+  },
+  "92134": {
+    "installation": "MCRD San Diego",
+    "with": 3987,
+    "without": 3132
+  },
+  "92140": {
+    "installation": "Naval Submarine Base Point Loma",
+    "with": 3987,
+    "without": 3132
+  },
+  "92132": {
+    "installation": "NAS North Island",
+    "with": 3987,
+    "without": 3132
+  },
+  "92145": {
+    "installation": "MCAS Miramar",
+    "with": 3987,
+    "without": 3132
+  },
+  "92071": {
+    "installation": "Santee / San Diego East",
+    "with": 3987,
+    "without": 3132
+  },
+  "92078": {
+    "installation": "San Marcos / Camp Pendleton Area",
+    "with": 3921,
+    "without": 3084
+  },
+  "92278": {
+    "installation": "MCAGCC Twentynine Palms",
+    "with": 2055,
+    "without": 1770
+  },
+  "93437": {
+    "installation": "Vandenberg SFB",
+    "with": 3075,
+    "without": 2496
+  },
+  "93524": {
+    "installation": "Edwards AFB",
+    "with": 2274,
+    "without": 1887
+  },
+  "94535": {
+    "installation": "Travis AFB",
+    "with": 3504,
+    "without": 2784
+  },
+  "93941": {
+    "installation": "Presidio of Monterey / NPS",
+    "with": 3507,
+    "without": 2754
+  },
+  "94130": {
+    "installation": "Presidio of San Francisco",
+    "with": 4545,
+    "without": 3480
+  },
+  "93727": {
+    "installation": "Fresno / NAS Lemoore",
+    "with": 2196,
+    "without": 1773
+  },
+  "93246": {
+    "installation": "NAS Lemoore",
+    "with": 2196,
+    "without": 1773
+  },
+  "92311": {
+    "installation": "Fort Irwin / NTC",
+    "with": 2055,
+    "without": 1770
+  },
+  "90245": {
+    "installation": "Los Angeles AFB / El Segundo",
+    "with": 4074,
+    "without": 3102
+  },
+  "92802": {
+    "installation": "Anaheim / Los Alamitos",
+    "with": 4074,
+    "without": 3102
+  },
+  "93042": {
+    "installation": "NAS Point Mugu / Ventura County",
+    "with": 3498,
+    "without": 2832
+  },
+  "93041": {
+    "installation": "Port Hueneme CBC",
+    "with": 3498,
+    "without": 2832
+  },
+  "95054": {
+    "installation": "Santa Clara / Moffett Field",
+    "with": 4752,
+    "without": 3630
+  },
+  "95661": {
+    "installation": "Roseville / McClellan",
+    "with": 2778,
+    "without": 2163
+  },
+  "94571": {
+    "installation": "Rio Vista / Travis AFB Area",
+    "with": 3504,
+    "without": 2784
+  },
+  "92315": {
+    "installation": "Apple Valley / Barstow MCLB",
+    "with": 2055,
+    "without": 1770
+  },
+  "22134": {
+    "installation": "MCB Quantico",
+    "with": 2985,
+    "without": 2421
+  },
+  "22060": {
+    "installation": "Fort Belvoir",
+    "with": 2985,
+    "without": 2421
+  },
+  "22202": {
+    "installation": "Pentagon / Arlington",
+    "with": 2985,
+    "without": 2421
+  },
+  "22041": {
+    "installation": "Falls Church / Arlington Area",
+    "with": 2985,
+    "without": 2421
+  },
+  "22311": {
+    "installation": "Alexandria / Fort Belvoir Area",
+    "with": 2985,
+    "without": 2421
+  },
+  "22153": {
+    "installation": "Springfield / Fort Belvoir Area",
+    "with": 2985,
+    "without": 2421
+  },
+  "20755": {
+    "installation": "Fort Meade",
+    "with": 2808,
+    "without": 2265
+  },
+  "21005": {
+    "installation": "Aberdeen Proving Ground",
+    "with": 2808,
+    "without": 2265
+  },
+  "20670": {
+    "installation": "NAS Patuxent River",
+    "with": 2424,
+    "without": 1974
+  },
+  "20301": {
+    "installation": "Pentagon / DC Metro",
+    "with": 2985,
+    "without": 2421
+  },
+  "20032": {
+    "installation": "Joint Base Anacostia-Bolling",
+    "with": 2985,
+    "without": 2421
+  },
+  "20910": {
+    "installation": "Walter Reed / Bethesda",
+    "with": 2985,
+    "without": 2421
+  },
+  "20746": {
+    "installation": "JB Andrews",
+    "with": 2985,
+    "without": 2421
+  },
+  "21401": {
+    "installation": "Annapolis / USNA",
+    "with": 2808,
+    "without": 2265
+  },
+  "23510": {
+    "installation": "Naval Station Norfolk",
+    "with": 2325,
+    "without": 1869
+  },
+  "23511": {
+    "installation": "Norfolk Naval Shipyard Area",
+    "with": 2325,
+    "without": 1869
+  },
+  "23459": {
+    "installation": "Virginia Beach / NAS Oceana",
+    "with": 2325,
+    "without": 1869
+  },
+  "23666": {
+    "installation": "Hampton / Langley AFB",
+    "with": 2325,
+    "without": 1869
+  },
+  "23604": {
+    "installation": "Fort Eustis / JB Langley-Eustis",
+    "with": 2325,
+    "without": 1869
+  },
+  "23602": {
+    "installation": "Newport News / Langley-Eustis Area",
+    "with": 2325,
+    "without": 1869
+  },
+  "23690": {
+    "installation": "Yorktown / NWS",
+    "with": 2325,
+    "without": 1869
+  },
+  "23607": {
+    "installation": "Newport News Shipbuilding",
+    "with": 2325,
+    "without": 1869
+  },
+  "23061": {
+    "installation": "Gloucester / Camp Peary",
+    "with": 2325,
+    "without": 1869
+  },
+  "98433": {
+    "installation": "Joint Base Lewis-McChord",
+    "with": 2508,
+    "without": 2013
+  },
+  "98438": {
+    "installation": "McChord Field / JBLM",
+    "with": 2508,
+    "without": 2013
+  },
+  "98503": {
+    "installation": "Lacey / JBLM Area",
+    "with": 2508,
+    "without": 2013
+  },
+  "98310": {
+    "installation": "Naval Base Kitsap Bremerton",
+    "with": 2508,
+    "without": 2013
+  },
+  "98315": {
+    "installation": "Naval Base Kitsap Bangor",
+    "with": 2508,
+    "without": 2013
+  },
+  "98278": {
+    "installation": "NAS Whidbey Island",
+    "with": 2508,
+    "without": 2013
+  },
+  "98115": {
+    "installation": "Seattle / NAS Seattle Area",
+    "with": 2970,
+    "without": 2370
+  },
+  "99011": {
+    "installation": "Fairchild AFB / Spokane",
+    "with": 1881,
+    "without": 1542
+  },
+  "28310": {
+    "installation": "Fort Liberty (Bragg)",
+    "with": 1785,
+    "without": 1527
+  },
+  "28307": {
+    "installation": "Fayetteville / Fort Liberty Area",
+    "with": 1785,
+    "without": 1527
+  },
+  "28547": {
+    "installation": "Camp Lejeune",
+    "with": 1560,
+    "without": 1443
+  },
+  "28540": {
+    "installation": "Jacksonville / Camp Lejeune Area",
+    "with": 1560,
+    "without": 1443
+  },
+  "28543": {
+    "installation": "MCAS New River",
+    "with": 1560,
+    "without": 1443
+  },
+  "28532": {
+    "installation": "MCAS Cherry Point",
+    "with": 1506,
+    "without": 1359
+  },
+  "27531": {
+    "installation": "Goldsboro / Seymour Johnson AFB",
+    "with": 1416,
+    "without": 1251
+  },
+  "28306": {
+    "installation": "Fayetteville / Pope AAF",
+    "with": 1785,
+    "without": 1527
+  },
+  "76544": {
+    "installation": "Fort Cavazos (Hood)",
+    "with": 1581,
+    "without": 1452
+  },
+  "76542": {
+    "installation": "Killeen / Fort Cavazos Area",
+    "with": 1581,
+    "without": 1452
+  },
+  "78236": {
+    "installation": "JBSA-Lackland",
+    "with": 1935,
+    "without": 1530
+  },
+  "78234": {
+    "installation": "JBSA-Fort Sam Houston",
+    "with": 1935,
+    "without": 1530
+  },
+  "78150": {
+    "installation": "JBSA-Randolph",
+    "with": 1935,
+    "without": 1530
+  },
+  "78235": {
+    "installation": "BAMC / San Antonio Military",
+    "with": 1935,
+    "without": 1530
+  },
+  "79906": {
+    "installation": "Fort Bliss",
+    "with": 1773,
+    "without": 1425
+  },
+  "79916": {
+    "installation": "Fort Bliss / El Paso",
+    "with": 1773,
+    "without": 1425
+  },
+  "79908": {
+    "installation": "Fort Bliss / Biggs AAF",
+    "with": 1773,
+    "without": 1425
+  },
+  "76127": {
+    "installation": "NAS JRB Fort Worth",
+    "with": 2163,
+    "without": 1728
+  },
+  "78419": {
+    "installation": "NAS Corpus Christi",
+    "with": 1632,
+    "without": 1395
+  },
+  "78418": {
+    "installation": "NAS Corpus Christi / Flour Bluff",
+    "with": 1632,
+    "without": 1395
+  },
+  "78840": {
+    "installation": "Laughlin AFB / Del Rio",
+    "with": 1308,
+    "without": 1170
+  },
+  "76311": {
+    "installation": "Sheppard AFB / Wichita Falls",
+    "with": 1350,
+    "without": 1182
+  },
+  "79607": {
+    "installation": "Dyess AFB / Abilene",
+    "with": 1386,
+    "without": 1200
+  },
+  "75038": {
+    "installation": "Dallas / NAS JRB Area",
+    "with": 2163,
+    "without": 1728
+  },
+  "80913": {
+    "installation": "Fort Carson / Colorado Springs",
+    "with": 2340,
+    "without": 1875
+  },
+  "80902": {
+    "installation": "Fort Carson",
+    "with": 2340,
+    "without": 1875
+  },
+  "80840": {
+    "installation": "USAFA / Peterson SFB",
+    "with": 2340,
+    "without": 1875
+  },
+  "80914": {
+    "installation": "Peterson SFB",
+    "with": 2340,
+    "without": 1875
+  },
+  "80925": {
+    "installation": "Schriever SFB",
+    "with": 2340,
+    "without": 1875
+  },
+  "80911": {
+    "installation": "Fort Carson Main Gate Area",
+    "with": 2340,
+    "without": 1875
+  },
+  "80401": {
+    "installation": "Denver / Buckley SFB Area",
+    "with": 2655,
+    "without": 2127
+  },
+  "80011": {
+    "installation": "Buckley SFB / Aurora",
+    "with": 2655,
+    "without": 2127
+  },
+  "31314": {
+    "installation": "Fort Stewart",
+    "with": 2163,
+    "without": 1824
+  },
+  "31315": {
+    "installation": "Hinesville / Fort Stewart Area",
+    "with": 2163,
+    "without": 1824
+  },
+  "31905": {
+    "installation": "Fort Moore (Benning)",
+    "with": 1665,
+    "without": 1434
+  },
+  "31907": {
+    "installation": "Columbus / Fort Moore Area",
+    "with": 1665,
+    "without": 1434
+  },
+  "31098": {
+    "installation": "Robins AFB / Warner Robins",
+    "with": 1632,
+    "without": 1383
+  },
+  "31405": {
+    "installation": "Savannah / Hunter AAF",
+    "with": 2163,
+    "without": 1824
+  },
+  "39110": {
+    "installation": "NAS Meridian",
+    "with": 1374,
+    "without": 1194
+  },
+  "39534": {
+    "installation": "Keesler AFB / Biloxi",
+    "with": 1488,
+    "without": 1359
+  },
+  "39565": {
+    "installation": "Stennis Space Center / NCBC Gulfport",
+    "with": 1488,
+    "without": 1359
+  },
+  "39401": {
+    "installation": "Camp Shelby / Hattiesburg",
+    "with": 1374,
+    "without": 1194
+  },
+  "39042": {
+    "installation": "NAS Meridian Area",
+    "with": 1374,
+    "without": 1194
+  },
+  "42223": {
+    "installation": "Fort Campbell",
+    "with": 1812,
+    "without": 1635
+  },
+  "42240": {
+    "installation": "Hopkinsville / Fort Campbell Area",
+    "with": 1812,
+    "without": 1635
+  },
+  "37040": {
+    "installation": "Clarksville / Fort Campbell TN Side",
+    "with": 1812,
+    "without": 1635
+  },
+  "32508": {
+    "installation": "NAS Pensacola",
+    "with": 1833,
+    "without": 1629
+  },
+  "32578": {
+    "installation": "NAS Whiting Field",
+    "with": 1833,
+    "without": 1629
+  },
+  "32542": {
+    "installation": "Hurlburt Field",
+    "with": 1833,
+    "without": 1629
+  },
+  "32544": {
+    "installation": "Eglin AFB",
+    "with": 1833,
+    "without": 1629
+  },
+  "32403": {
+    "installation": "Tyndall AFB / Panama City",
+    "with": 1728,
+    "without": 1536
+  },
+  "33621": {
+    "installation": "MacDill AFB / Tampa",
+    "with": 2241,
+    "without": 1845
+  },
+  "32228": {
+    "installation": "NAS Jacksonville",
+    "with": 2049,
+    "without": 1674
+  },
+  "32212": {
+    "installation": "NAS Jacksonville / Orange Park",
+    "with": 2049,
+    "without": 1674
+  },
+  "32136": {
+    "installation": "NSB Kings Bay",
+    "with": 1791,
+    "without": 1494
+  },
+  "32925": {
+    "installation": "Patrick SFB / Cape Canaveral",
+    "with": 2124,
+    "without": 1764
+  },
+  "34609": {
+    "installation": "Brooksville / Hernando",
+    "with": 2040,
+    "without": 1680
+  },
+  "32401": {
+    "installation": "Panama City / Tyndall Area",
+    "with": 1728,
+    "without": 1536
+  },
+  "33825": {
+    "installation": "Avon Park AFR",
+    "with": 1617,
+    "without": 1398
+  },
+  "34946": {
+    "installation": "Fort Pierce / Treasure Coast",
+    "with": 2217,
+    "without": 1812
+  },
+  "32801": {
+    "installation": "Orlando Area",
+    "with": 2199,
+    "without": 1803
+  },
+  "33040": {
+    "installation": "NAS Key West",
+    "with": 3399,
+    "without": 2706
+  },
+  "33607": {
+    "installation": "Tampa / MacDill Area",
+    "with": 2241,
+    "without": 1845
+  },
+  "36362": {
+    "installation": "Fort Novosel (Rucker)",
+    "with": 1485,
+    "without": 1290
+  },
+  "36114": {
+    "installation": "Maxwell AFB / Montgomery",
+    "with": 1551,
+    "without": 1341
+  },
+  "35898": {
+    "installation": "Redstone Arsenal / Huntsville",
+    "with": 1704,
+    "without": 1434
+  },
+  "36608": {
+    "installation": "Mobile / Brookley",
+    "with": 1566,
+    "without": 1374
+  },
+  "36542": {
+    "installation": "Gulf Shores / Fort Morgan",
+    "with": 1566,
+    "without": 1374
+  },
+  "71110": {
+    "installation": "Barksdale AFB / Shreveport",
+    "with": 1443,
+    "without": 1254
+  },
+  "70461": {
+    "installation": "NAS JRB New Orleans",
+    "with": 1746,
+    "without": 1464
+  },
+  "70542": {
+    "installation": "Fort Johnson (Polk)",
+    "with": 1314,
+    "without": 1173
+  },
+  "71459": {
+    "installation": "Fort Johnson / Leesville",
+    "with": 1314,
+    "without": 1173
+  },
+  "70037": {
+    "installation": "Belle Chasse NAS Area",
+    "with": 1746,
+    "without": 1464
+  },
+  "29152": {
+    "installation": "Fort Jackson / Columbia",
+    "with": 1740,
+    "without": 1497
+  },
+  "29209": {
+    "installation": "Columbia / Fort Jackson Area",
+    "with": 1740,
+    "without": 1497
+  },
+  "29445": {
+    "installation": "NWS Charleston / Goose Creek",
+    "with": 2265,
+    "without": 1878
+  },
+  "29404": {
+    "installation": "JB Charleston",
+    "with": 2265,
+    "without": 1878
+  },
+  "29607": {
+    "installation": "Greenville / Donaldson Center",
+    "with": 1659,
+    "without": 1404
+  },
+  "29906": {
+    "installation": "MCAS Beaufort / Parris Island",
+    "with": 1899,
+    "without": 1620
+  },
+  "29905": {
+    "installation": "MCRD Parris Island",
+    "with": 1899,
+    "without": 1620
+  },
+  "29170": {
+    "installation": "Shaw AFB / Sumter",
+    "with": 1491,
+    "without": 1320
+  },
+  "13602": {
+    "installation": "Fort Drum",
+    "with": 1581,
+    "without": 1323
+  },
+  "13603": {
+    "installation": "Fort Drum / Watertown",
+    "with": 1581,
+    "without": 1323
+  },
+  "10996": {
+    "installation": "USMA West Point",
+    "with": 3036,
+    "without": 2478
+  },
+  "13441": {
+    "installation": "Rome / Griffiss Technology Park",
+    "with": 1539,
+    "without": 1266
+  },
+  "12180": {
+    "installation": "Watervliet Arsenal / Troy",
+    "with": 1776,
+    "without": 1449
+  },
+  "11735": {
+    "installation": "Long Island / Farmingdale",
+    "with": 3789,
+    "without": 2880
+  },
+  "10001": {
+    "installation": "New York City Area",
+    "with": 4269,
+    "without": 3321
+  },
+  "07002": {
+    "installation": "Bayonne / NJ Military Ocean Terminal",
+    "with": 3780,
+    "without": 2919
+  },
+  "07806": {
+    "installation": "Picatinny Arsenal",
+    "with": 3231,
+    "without": 2553
+  },
+  "08640": {
+    "installation": "JB McGuire-Dix-Lakehurst",
+    "with": 2700,
+    "without": 2181
+  },
+  "08641": {
+    "installation": "Fort Dix",
+    "with": 2700,
+    "without": 2181
+  },
+  "08733": {
+    "installation": "Lakehurst / JB MDL Area",
+    "with": 2700,
+    "without": 2181
+  },
+  "08742": {
+    "installation": "Earle NWS",
+    "with": 2700,
+    "without": 2181
+  },
+  "19111": {
+    "installation": "Philadelphia / NE",
+    "with": 2496,
+    "without": 2001
+  },
+  "17003": {
+    "installation": "Carlisle Barracks / Army War College",
+    "with": 1851,
+    "without": 1536
+  },
+  "15071": {
+    "installation": "Pittsburgh / 911th AW",
+    "with": 1767,
+    "without": 1449
+  },
+  "19013": {
+    "installation": "Chester / Philadelphia Area",
+    "with": 2496,
+    "without": 2001
+  },
+  "06340": {
+    "installation": "Naval Submarine Base New London",
+    "with": 2526,
+    "without": 2103
+  },
+  "01022": {
+    "installation": "Westover ARB / Chicopee",
+    "with": 2106,
+    "without": 1725
+  },
+  "02542": {
+    "installation": "JB Cape Cod / Otis",
+    "with": 2631,
+    "without": 2112
+  },
+  "02841": {
+    "installation": "Naval Station Newport",
+    "with": 2418,
+    "without": 1965
+  },
+  "03801": {
+    "installation": "Portsmouth Naval Shipyard",
+    "with": 2439,
+    "without": 2016
+  },
+  "04401": {
+    "installation": "Bangor / NSGA",
+    "with": 1710,
+    "without": 1410
+  },
+  "04401": {
+    "installation": "Bangor / Naval Security Group",
+    "with": 1710,
+    "without": 1410
+  },
+  "85613": {
+    "installation": "Fort Huachuca",
+    "with": 1665,
+    "without": 1365
+  },
+  "85365": {
+    "installation": "MCAS Yuma / Yuma Proving Ground",
+    "with": 1635,
+    "without": 1398
+  },
+  "85707": {
+    "installation": "Davis-Monthan AFB / Tucson",
+    "with": 1770,
+    "without": 1467
+  },
+  "85309": {
+    "installation": "Luke AFB / Glendale",
+    "with": 2088,
+    "without": 1716
+  },
+  "85281": {
+    "installation": "Tempe / Phoenix Area",
+    "with": 2088,
+    "without": 1716
+  },
+  "87117": {
+    "installation": "Kirtland AFB / Albuquerque",
+    "with": 1791,
+    "without": 1470
+  },
+  "88002": {
+    "installation": "White Sands Missile Range",
+    "with": 1569,
+    "without": 1311
+  },
+  "88101": {
+    "installation": "Cannon AFB / Clovis",
+    "with": 1254,
+    "without": 1101
+  },
+  "88201": {
+    "installation": "Roswell / Walker AFB Area",
+    "with": 1272,
+    "without": 1113
+  },
+  "89191": {
+    "installation": "Nellis AFB / Las Vegas",
+    "with": 2172,
+    "without": 1791
+  },
+  "89015": {
+    "installation": "Henderson / Nellis Area",
+    "with": 2172,
+    "without": 1791
+  },
+  "89406": {
+    "installation": "NAS Fallon",
+    "with": 1719,
+    "without": 1428
+  },
+  "84022": {
+    "installation": "Dugway Proving Ground",
+    "with": 1830,
+    "without": 1509
+  },
+  "84056": {
+    "installation": "Hill AFB / Ogden",
+    "with": 1830,
+    "without": 1509
+  },
+  "84401": {
+    "installation": "Ogden / Hill AFB Area",
+    "with": 1830,
+    "without": 1509
+  },
+  "83648": {
+    "installation": "Mountain Home AFB",
+    "with": 1494,
+    "without": 1287
+  },
+  "59404": {
+    "installation": "Malmstrom AFB / Great Falls",
+    "with": 1440,
+    "without": 1233
+  },
+  "82001": {
+    "installation": "FE Warren AFB / Cheyenne",
+    "with": 1656,
+    "without": 1365
+  },
+  "57706": {
+    "installation": "Ellsworth AFB / Rapid City",
+    "with": 1440,
+    "without": 1203
+  },
+  "58102": {
+    "installation": "Fargo / ND ARNG",
+    "with": 1560,
+    "without": 1254
+  },
+  "58705": {
+    "installation": "Minot AFB",
+    "with": 1323,
+    "without": 1125
+  },
+  "58002": {
+    "installation": "Grand Forks AFB",
+    "with": 1392,
+    "without": 1158
+  },
+  "68005": {
+    "installation": "Offutt AFB / Bellevue",
+    "with": 1803,
+    "without": 1476
+  },
+  "68113": {
+    "installation": "Offutt AFB",
+    "with": 1803,
+    "without": 1476
+  },
+  "66442": {
+    "installation": "Fort Riley",
+    "with": 1440,
+    "without": 1203
+  },
+  "67210": {
+    "installation": "McConnell AFB / Wichita",
+    "with": 1506,
+    "without": 1254
+  },
+  "64735": {
+    "installation": "Whiteman AFB / Knob Noster",
+    "with": 1407,
+    "without": 1170
+  },
+  "65473": {
+    "installation": "Fort Leonard Wood",
+    "with": 1383,
+    "without": 1200
+  },
+  "63125": {
+    "installation": "St. Louis / Jefferson Barracks",
+    "with": 1782,
+    "without": 1449
+  },
+  "52402": {
+    "installation": "Cedar Rapids / Iowa City Area",
+    "with": 1458,
+    "without": 1215
+  },
+  "50321": {
+    "installation": "Des Moines / Camp Dodge",
+    "with": 1545,
+    "without": 1260
+  },
+  "61801": {
+    "installation": "Champaign / Chanute Area",
+    "with": 1491,
+    "without": 1251
+  },
+  "62225": {
+    "installation": "Scott AFB",
+    "with": 1638,
+    "without": 1359
+  },
+  "60088": {
+    "installation": "Great Lakes / Naval Station",
+    "with": 2400,
+    "without": 1929
+  },
+  "60064": {
+    "installation": "North Chicago / Great Lakes Area",
+    "with": 2400,
+    "without": 1929
+  },
+  "61868": {
+    "installation": "Rantoul / Former Chanute",
+    "with": 1491,
+    "without": 1251
+  },
+  "48045": {
+    "installation": "SMTC Selfridge ANGB / Mt. Clemens",
+    "with": 1893,
+    "without": 1497
+  },
+  "49221": {
+    "installation": "Adrian / Camp Grayling Area",
+    "with": 1458,
+    "without": 1206
+  },
+  "55450": {
+    "installation": "Minneapolis–St. Paul / Fort Snelling",
+    "with": 2019,
+    "without": 1641
+  },
+  "53704": {
+    "installation": "Madison / Truax Field",
+    "with": 1713,
+    "without": 1422
+  },
+  "53110": {
+    "installation": "Milwaukee / Mitchell IAP",
+    "with": 1764,
+    "without": 1434
+  },
+  "47438": {
+    "installation": "Crane NSWC",
+    "with": 1380,
+    "without": 1152
+  },
+  "46216": {
+    "installation": "Indianapolis / Camp Atterbury Area",
+    "with": 1596,
+    "without": 1317
+  },
+  "45433": {
+    "installation": "Wright-Patterson AFB",
+    "with": 1611,
+    "without": 1317
+  },
+  "44870": {
+    "installation": "Sandusky / Camp Perry",
+    "with": 1395,
+    "without": 1179
+  },
+  "44236": {
+    "installation": "Youngstown ARS",
+    "with": 1356,
+    "without": 1131
+  },
+  "40121": {
+    "installation": "Fort Knox",
+    "with": 1539,
+    "without": 1347
+  },
+  "37389": {
+    "installation": "Arnold AFB / Tullahoma",
+    "with": 1377,
+    "without": 1200
+  },
+  "38109": {
+    "installation": "Memphis / NSA Mid-South",
+    "with": 1665,
+    "without": 1407
+  },
+  "37167": {
+    "installation": "Smyrna / Berry Field ANGB",
+    "with": 1827,
+    "without": 1488
+  },
+  "37130": {
+    "installation": "Murfreesboro / Nashville Area",
+    "with": 1827,
+    "without": 1488
+  },
+  "73145": {
+    "installation": "Tinker AFB / Oklahoma City",
+    "with": 1608,
+    "without": 1338
+  },
+  "73503": {
+    "installation": "Fort Sill / Lawton",
+    "with": 1416,
+    "without": 1200
+  },
+  "74006": {
+    "installation": "Tulsa / Army Ammunition Plant",
+    "with": 1494,
+    "without": 1248
+  },
+  "73523": {
+    "installation": "Altus AFB",
+    "with": 1260,
+    "without": 1107
+  },
+  "74116": {
+    "installation": "Tulsa IAP ANGB",
+    "with": 1494,
+    "without": 1248
+  },
+  "72099": {
+    "installation": "Little Rock AFB",
+    "with": 1488,
+    "without": 1272
+  },
+  "72903": {
+    "installation": "Fort Smith / Ebbing ANGB",
+    "with": 1284,
+    "without": 1125
+  },
+  "71854": {
+    "installation": "Texarkana / Red River Army Depot",
+    "with": 1350,
+    "without": 1176
+  },
+  "96910": {
+    "installation": "Andersen AFB / Guam",
+    "with": 2685,
+    "without": 2166
+  },
+  "96929": {
+    "installation": "Naval Base Guam",
+    "with": 2685,
+    "without": 2166
+  },
+  "96950": {
+    "installation": "Saipan / CNMI",
+    "with": 1827,
+    "without": 1509
+  },
+  "96362": {
+    "installation": "Kadena AB / Okinawa",
+    "with": 2388,
+    "without": 1977
+  },
+  "96319": {
+    "installation": "Misawa AB / Japan",
+    "with": 2130,
+    "without": 1749
+  },
+  "96343": {
+    "installation": "Yokota AB / Japan",
+    "with": 2595,
+    "without": 2088
+  },
+  "96349": {
+    "installation": "Camp Zama / Japan",
+    "with": 2595,
+    "without": 2088
+  },
+  "96367": {
+    "installation": "Camp Foster / Okinawa",
+    "with": 2388,
+    "without": 1977
+  },
+  "96368": {
+    "installation": "Camp Courtney / Okinawa",
+    "with": 2388,
+    "without": 1977
+  },
+  "96540": {
+    "installation": "Camp Humphreys / Korea",
+    "with": 2244,
+    "without": 1845
+  },
+  "96258": {
+    "installation": "USAG Daegu / Korea",
+    "with": 2100,
+    "without": 1740
+  },
+  "09007": {
+    "installation": "Grafenwoehr / Germany",
+    "with": 2196,
+    "without": 1815
+  },
+  "09114": {
+    "installation": "Ramstein AB / Germany",
+    "with": 2196,
+    "without": 1815
+  },
+  "09172": {
+    "installation": "Stuttgart / USAG",
+    "with": 2328,
+    "without": 1920
+  },
+  "09096": {
+    "installation": "Wiesbaden / Germany",
+    "with": 2196,
+    "without": 1815
+  },
+  "09461": {
+    "installation": "Vilseck / Rose Barracks",
+    "with": 2196,
+    "without": 1815
+  },
+  "09630": {
+    "installation": "Ansbach / Katterbach",
+    "with": 2196,
+    "without": 1815
+  },
+  "09135": {
+    "installation": "Spangdahlem AB / Germany",
+    "with": 2196,
+    "without": 1815
+  },
+  "09824": {
+    "installation": "Vicenza / Italy",
+    "with": 2250,
+    "without": 1857
+  },
+  "09613": {
+    "installation": "Aviano AB / Italy",
+    "with": 2250,
+    "without": 1857
+  },
+  "09604": {
+    "installation": "NSA Naples / Italy",
+    "with": 2250,
+    "without": 1857
+  },
+  "09852": {
+    "installation": "NAS Sigonella / Sicily",
+    "with": 2100,
+    "without": 1731
+  },
+  "09855": {
+    "installation": "NSA Souda Bay / Greece-Crete",
+    "with": 1935,
+    "without": 1596
+  },
+  "09469": {
+    "installation": "SHAPE / Belgium",
+    "with": 2307,
+    "without": 1896
+  },
+  "09214": {
+    "installation": "RAF Lakenheath / UK",
+    "with": 2457,
+    "without": 2016
+  },
+  "09110": {
+    "installation": "RAF Mildenhall / UK",
+    "with": 2457,
+    "without": 2016
+  },
+  "09211": {
+    "installation": "RAF Croughton / UK",
+    "with": 2457,
+    "without": 2016
+  },
+  "09456": {
+    "installation": "Baumholder / Germany",
+    "with": 2196,
+    "without": 1815
+  },
+  "09012": {
+    "installation": "Hohenfels / Germany",
+    "with": 2196,
+    "without": 1815
+  },
+  "09354": {
+    "installation": "Rota / Spain",
+    "with": 2130,
+    "without": 1755
+  },
+  "96555": {
+    "installation": "Fort Wainwright / Fairbanks",
+    "with": 2301,
+    "without": 1872
+  },
+  "99505": {
+    "installation": "JB Elmendorf-Richardson / Anchorage",
+    "with": 2640,
+    "without": 2124
+  },
+  "99506": {
+    "installation": "JBER / Anchorage Area",
+    "with": 2640,
+    "without": 2124
+  },
+  "99702": {
+    "installation": "Eielson AFB / Fairbanks",
+    "with": 2301,
+    "without": 1872
+  },
+  "99615": {
+    "installation": "Kodiak / USCG Base",
+    "with": 2589,
+    "without": 2076
+  },
+  "99501": {
+    "installation": "Anchorage / Fort Richardson Area",
+    "with": 2640,
+    "without": 2124
+  },
+  "96372": {
+    "installation": "Camp Hansen / Okinawa",
+    "with": 2388,
+    "without": 1977
+  },
+  "96557": {
+    "installation": "Fort Greely / Delta Junction",
+    "with": 2301,
+    "without": 1872
+  },
+  "96542": {
+    "installation": "Osan AB / Korea",
+    "with": 2244,
+    "without": 1845
+  },
+  "96264": {
+    "installation": "USAG Yongsan / Korea",
+    "with": 2244,
+    "without": 1845
+  },
+  "96205": {
+    "installation": "Camp Casey / Korea",
+    "with": 2244,
+    "without": 1845
+  },
+  "96548": {
+    "installation": "Kunsan AB / Korea",
+    "with": 2100,
+    "without": 1740
+  },
+  "96326": {
+    "installation": "Yokosuka Naval Base / Japan",
+    "with": 2595,
+    "without": 2088
+  },
+  "96350": {
+    "installation": "Sasebo Naval Base / Japan",
+    "with": 2130,
+    "without": 1749
+  },
+  "96310": {
+    "installation": "MCAS Iwakuni / Japan",
+    "with": 2130,
+    "without": 1749
+  },
+  "96335": {
+    "installation": "NF Atsugi / Japan",
+    "with": 2595,
+    "without": 2088
+  },
+  "34008": {
+    "installation": "Bahrain / NSA",
+    "with": 2496,
+    "without": 2061
+  },
+  "09834": {
+    "installation": "NSA Naples / Gricignano",
+    "with": 2250,
+    "without": 1857
+  },
+  "09266": {
+    "installation": "Incirlik AB / Turkey",
+    "with": 1680,
+    "without": 1386
+  },
+  "09853": {
+    "installation": "Camp Lemonnier / Djibouti",
+    "with": 1680,
+    "without": 1386
+  },
+  "34667": {
+    "installation": "Spring Hill / Brooksville",
+    "with": 2040,
+    "without": 1680
+  },
+  "36330": {
+    "installation": "Enterprise / Fort Novosel Area",
+    "with": 1485,
+    "without": 1290
+  },
+  "30905": {
+    "installation": "Augusta / Fort Eisenhower (Gordon)",
+    "with": 1680,
+    "without": 1443
+  },
+  "30813": {
+    "installation": "Fort Eisenhower / Grovetown",
+    "with": 1680,
+    "without": 1443
+  },
+  "31699": {
+    "installation": "Moody AFB / Valdosta",
+    "with": 1416,
+    "without": 1227
+  },
+  "96543": {
+    "installation": "Camp Walker / Daegu Korea",
+    "with": 2100,
+    "without": 1740
+  },
+  "23321": {
+    "installation": "Chesapeake / Norfolk MHA",
+    "with": 2325,
+    "without": 1869
+  },
+  "23188": {
+    "installation": "Williamsburg / Camp Peary Area",
+    "with": 2325,
+    "without": 1869
+  },
+  "24060": {
+    "installation": "Blacksburg / Radford AAP",
+    "with": 1476,
+    "without": 1236
+  },
+  "22407": {
+    "installation": "Fredericksburg / Quantico Area",
+    "with": 2985,
+    "without": 2421
+  },
+  "22193": {
+    "installation": "Woodbridge / Quantico Area",
+    "with": 2985,
+    "without": 2421
+  },
+  "24016": {
+    "installation": "Roanoke / NG Readiness Center",
+    "with": 1476,
+    "without": 1236
+  },
+  "22448": {
+    "installation": "Indian Head NSWC",
+    "with": 2808,
+    "without": 2265
+  },
+  "22172": {
+    "installation": "Triangle / Quantico Gate",
+    "with": 2985,
+    "without": 2421
+  },
+  "25401": {
+    "installation": "Martinsburg / EARNG",
+    "with": 1575,
+    "without": 1308
+  },
+  "62269": {
+    "installation": "O'Fallon / Scott AFB Area",
+    "with": 1638,
+    "without": 1359
+  },
+  "62040": {
+    "installation": "Granite City / Army Depot",
+    "with": 1638,
+    "without": 1359
+  },
+  "60050": {
+    "installation": "McHenry / Great Lakes Area",
+    "with": 2400,
+    "without": 1929
+  },
+  "43217": {
+    "installation": "Columbus / Rickenbacker ANGB",
+    "with": 1611,
+    "without": 1290
+  },
+  "44315": {
+    "installation": "Akron / ARDC",
+    "with": 1410,
+    "without": 1176
+  },
+  "20001": {
+    "installation": "Washington DC",
+    "with": 2985,
+    "without": 2421
+  },
+  "33169": {
+    "installation": "Miami / USSOUTHCOM",
+    "with": 2952,
+    "without": 2367
+  },
+  "29492": {
+    "installation": "Charleston / Weapons Station Area",
+    "with": 2265,
+    "without": 1878
+  },
+  "78045": {
+    "installation": "Laredo / AFS",
+    "with": 1431,
+    "without": 1233
+  },
+  "75507": {
+    "installation": "Texarkana / Red River",
+    "with": 1350,
+    "without": 1176
+  },
+  "73071": {
+    "installation": "Norman / Tinker Area",
+    "with": 1608,
+    "without": 1338
+  },
+  "97218": {
+    "installation": "Portland / Air Guard Station",
+    "with": 2511,
+    "without": 2025
+  },
+  "97321": {
+    "installation": "Albany / Camp Adair Area",
+    "with": 1986,
+    "without": 1638
+  },
+  "97603": {
+    "installation": "Klamath Falls / Kingsley Field",
+    "with": 1680,
+    "without": 1383
+  },
+  "80045": {
+    "installation": "Aurora / Buckley Area",
+    "with": 2655,
+    "without": 2127
+  },
+  "37388": {
+    "installation": "Tullahoma / Arnold Engineering",
+    "with": 1377,
+    "without": 1200
+  },
+  "38111": {
+    "installation": "Memphis / NAS Area",
+    "with": 1665,
+    "without": 1407
+  },
+  "35805": {
+    "installation": "Huntsville / Redstone Area",
+    "with": 1704,
+    "without": 1434
+  },
+  "30052": {
+    "installation": "Loganville / Fort Gillem Area",
+    "with": 1971,
+    "without": 1635
+  },
+  "30339": {
+    "installation": "Atlanta / Dobbins ARB",
+    "with": 1971,
+    "without": 1635
+  },
+  "30060": {
+    "installation": "Marietta / Dobbins ARB Area",
+    "with": 1971,
+    "without": 1635
+  },
+  "30297": {
+    "installation": "Forest Park / Fort Gillem",
+    "with": 1971,
+    "without": 1635
+  },
+  "55111": {
+    "installation": "Minneapolis / St. Paul IAP ARS",
+    "with": 2019,
+    "without": 1641
+  },
+  "55155": {
+    "installation": "St. Paul / Fort Snelling Area",
+    "with": 2019,
+    "without": 1641
+  },
+  "56003": {
+    "installation": "Mankato / MN NG Area",
+    "with": 1431,
+    "without": 1191
+  },
+  "55604": {
+    "installation": "Duluth / 148th FW",
+    "with": 1509,
+    "without": 1260
+  },
+  "98110": {
+    "installation": "Bainbridge Island / Kitsap Area",
+    "with": 2508,
+    "without": 2013
+  },
+  "98584": {
+    "installation": "Shelton / JBLM Extended Area",
+    "with": 2508,
+    "without": 2013
+  },
+  "96853": {
+    "installation": "Camp H.M. Smith / Hawaii",
+    "with": 3513,
+    "without": 2682
+  },
+  "96818": {
+    "installation": "Fort Shafter / Hawaii",
+    "with": 3513,
+    "without": 2682
+  },
+  "96819": {
+    "installation": "Honolulu / Aliamanu",
+    "with": 3513,
+    "without": 2682
+  },
+  "93033": {
+    "installation": "Oxnard / NBVC Area",
+    "with": 3498,
+    "without": 2832
+  },
+  "92019": {
+    "installation": "El Cajon / San Diego Area",
+    "with": 3987,
+    "without": 3132
+  },
+  "92069": {
+    "installation": "San Marcos / Camp Pendleton Extended",
+    "with": 3921,
+    "without": 3084
+  },
+  "92056": {
+    "installation": "Oceanside / Camp Pendleton Area",
+    "with": 3921,
+    "without": 3084
+  },
+  "92024": {
+    "installation": "Encinitas / San Diego North",
+    "with": 3987,
+    "without": 3132
+  },
+  "91911": {
+    "installation": "Chula Vista / San Diego South",
+    "with": 3987,
+    "without": 3132
+  },
+  "19090": {
+    "installation": "Willow Grove NAS JRB",
+    "with": 2496,
+    "without": 2001
+  },
+  "06385": {
+    "installation": "Waterford / Sub Base New London Area",
+    "with": 2526,
+    "without": 2103
+  },
+  "02840": {
+    "installation": "Newport / Naval Station Area",
+    "with": 2418,
+    "without": 1965
+  },
+  "01301": {
+    "installation": "Greenfield / Barnes ANGB Area",
+    "with": 2106,
+    "without": 1725
+  },
+  "05403": {
+    "installation": "Burlington / VT ANGB",
+    "with": 2190,
+    "without": 1791
+  },
+  "03431": {
+    "installation": "Keene / NH NG Area",
+    "with": 1920,
+    "without": 1596
+  },
+  "03110": {
+    "installation": "Bedford / Manchester ANGB Area",
+    "with": 2439,
+    "without": 2016
+  },
+  "48442": {
+    "installation": "Highland / Camp Grayling",
+    "with": 1458,
+    "without": 1206
+  },
+  "48917": {
+    "installation": "Lansing / Camp Grayling Area",
+    "with": 1596,
+    "without": 1308
+  }
+}

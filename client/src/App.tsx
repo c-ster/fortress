@@ -5,6 +5,7 @@ import { LoginPage } from './components/auth/LoginPage';
 import { RegisterPage } from './components/auth/RegisterPage';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { useAuthStore } from './stores/auth';
+import { useBahPrefetch } from './hooks/useBahPrefetch';
 
 function Header() {
   const { isAuthenticated, user, logout } = useAuthStore();
@@ -55,6 +56,9 @@ export function App() {
   useEffect(() => {
     refreshSession();
   }, [refreshSession]);
+
+  // Pre-fetch full BAH table (IndexedDB → server → cache)
+  useBahPrefetch();
 
   return (
     <div className="min-h-screen">

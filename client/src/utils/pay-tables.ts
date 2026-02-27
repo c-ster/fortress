@@ -1,4 +1,5 @@
 import type { PayGrade } from '@fortress/types';
+import { config } from '../config';
 
 // --- Types for JSON data ---
 
@@ -13,13 +14,13 @@ interface BasTable {
   officer: number;
 }
 
-interface BahEntry {
+export interface BahEntry {
   installation: string;
   with: number;
   without: number;
 }
 
-interface BahTable {
+export interface BahTable {
   meta: Record<string, unknown>;
   [zip: string]: BahEntry | Record<string, unknown>;
 }
@@ -29,6 +30,9 @@ interface BahTable {
 let basePayData: BasePayTable | null = null;
 let basData: BasTable | null = null;
 let bahData: BahTable | null = null;
+
+/** Full BAH table fetched from the server (or IndexedDB). */
+let bahFullTable: BahTable | null = null;
 
 async function loadBasePay(): Promise<BasePayTable> {
   if (!basePayData) {
@@ -53,6 +57,50 @@ async function loadBah(): Promise<BahTable> {
   }
   return bahData;
 }
+
+// --- Full BAH table helpers ---
+
+/**
+ * Inject the full BAH table (from server or IndexedDB cache).
+ * Once set, lookupBah will check this table first before falling back to the stub.
+ */
+export function setBahFullTable(table: BahTable): void {
+  bahFullTable = table;
+}
+
+/** Check whether the full BAH table has been loaded. */
+export function isBahFullTableLoaded(): boolean {
+  return bahFullTable !== null;
+}
+
+/**
+ * Fetch the BAH version info from the server.
+ * Returns the hash and year for cache comparison.
+ */
+export async function fetchBahVersion(): Promise<{ hash: string; year: number }> {
+  const response = await fetch(`${config.apiUrl}/tables/version`);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch BAH version: ${response.status}`);
+  }
+  const data = (await response.json()) as { bah?: { hash: string; year: number } };
+  if (!data.bah) {
+    throw new Error('BAH version info not available');
+  }
+  return data.bah;
+}
+
+/**
+ * Fetch the full BAH table from the server.
+ */
+export async function fetchBahTable(year = 2025): Promise<BahTable> {
+  const response = await fetch(`${config.apiUrl}/tables/bah/${year}`);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch BAH table: ${response.status}`);
+  }
+  return response.json() as Promise<BahTable>;
+}
+
+// --- Lookups ---
 
 /**
  * Look up monthly base pay for a pay grade and years of service.
@@ -90,13 +138,26 @@ export async function lookupBas(grade: PayGrade): Promise<number> {
 
 /**
  * Look up BAH by ZIP code and dependent status.
- * Returns null if the ZIP is not in the stub table.
- * Note: Stub uses E5 baseline rates only.
+ * Checks the full server-fetched table first, then falls back to the bundled stub.
+ * Note: Uses E5 baseline rates.
  */
 export async function lookupBah(
   zip: string,
   hasDependents: boolean,
 ): Promise<{ amount: number; installation: string } | null> {
+  // 1. Check full table first (from server / IndexedDB)
+  if (bahFullTable) {
+    const fullEntry = bahFullTable[zip];
+    if (fullEntry && typeof fullEntry === 'object' && 'with' in fullEntry) {
+      const bahEntry = fullEntry as BahEntry;
+      return {
+        amount: hasDependents ? bahEntry.with : bahEntry.without,
+        installation: bahEntry.installation,
+      };
+    }
+  }
+
+  // 2. Fall back to bundled stub
   const table = await loadBah();
   const entry = table[zip];
   if (!entry || typeof entry !== 'object' || !('with' in entry)) return null;
