@@ -53,3 +53,23 @@ export async function loadSnapshot(
 
   return response.json() as Promise<EncryptedPayload>;
 }
+
+/**
+ * Delete the user's encrypted financial snapshot from the server.
+ */
+export async function deleteSnapshot(accessToken: string): Promise<void> {
+  const response = await fetch(`${config.apiUrl}/financial/snapshot`, {
+    method: 'DELETE',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+    credentials: 'include',
+  });
+
+  if (!response.ok && response.status !== 404) {
+    const body = await response.json().catch(() => ({ message: 'Unknown error' }));
+    throw new Error(
+      `Failed to delete snapshot: ${response.status} — ${body.message || response.statusText}`,
+    );
+  }
+}

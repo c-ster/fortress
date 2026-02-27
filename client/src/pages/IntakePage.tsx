@@ -3,7 +3,7 @@ import { IntakeWizard } from '../components/intake/IntakeWizard';
 import { LESUpload } from '../components/intake/LESUpload';
 import { LESConfirmation } from '../components/intake/LESConfirmation';
 import { PassphraseModal } from '../components/shared/PassphraseModal';
-import { loadSnapshot, decryptAndHydrate, DecryptionError } from '../crypto';
+import { loadSnapshot, decryptAndHydrate, DecryptionError, setPassphrase } from '../crypto';
 import { useAuthStore } from '../stores/auth';
 import { useFinancialStore } from '../stores/financial-state';
 import type { LESParseResult, LESFieldResult } from '@fortress/types';
@@ -58,6 +58,7 @@ export function IntakePage() {
       setLoadError('');
       try {
         await decryptAndHydrate(snapshotPayload, passphrase);
+        setPassphrase(passphrase);
         setShowLoadModal(false);
         setLoadState('loaded');
       } catch (err) {

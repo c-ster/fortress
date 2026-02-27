@@ -10,10 +10,13 @@ export function LoginPage() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    const success = await login(email, password);
-    if (success) {
+    const result = await login(email, password);
+    if (result === 'success') {
       navigate('/intake');
+    } else if (result === 'mfa_required') {
+      navigate('/mfa-verify');
     }
+    // 'error' → store.error already set, displayed below
   };
 
   return (

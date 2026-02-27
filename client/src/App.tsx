@@ -1,11 +1,14 @@
 import { useEffect } from 'react';
 import { Routes, Route, Link, useNavigate } from 'react-router-dom';
 import { IntakePage } from './pages/IntakePage';
+import { SettingsPage } from './pages/SettingsPage';
 import { LoginPage } from './components/auth/LoginPage';
 import { RegisterPage } from './components/auth/RegisterPage';
+import { MfaVerifyPage } from './components/auth/MfaVerifyPage';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { useAuthStore } from './stores/auth';
 import { useBahPrefetch } from './hooks/useBahPrefetch';
+import { useAutoSave } from './hooks/useAutoSave';
 import { Dashboard } from './pages/Dashboard';
 
 function Header() {
@@ -32,6 +35,12 @@ function Header() {
                 className="text-sm text-gray-300 hover:text-white transition-colors"
               >
                 Dashboard
+              </Link>
+              <Link
+                to="/settings"
+                className="text-sm text-gray-300 hover:text-white transition-colors"
+              >
+                Settings
               </Link>
               <span className="text-sm text-gray-300 hidden sm:block">
                 {user?.email}
@@ -66,6 +75,9 @@ export function App() {
 
   // Pre-fetch full BAH table (IndexedDB → server → cache)
   useBahPrefetch();
+
+  // Auto-save encrypted financial state (5s debounce)
+  useAutoSave();
 
   return (
     <div className="min-h-screen">
@@ -105,6 +117,7 @@ export function App() {
           />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/mfa-verify" element={<MfaVerifyPage />} />
           <Route
             path="/intake"
             element={
@@ -118,6 +131,14 @@ export function App() {
             element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute>
+                <SettingsPage />
               </ProtectedRoute>
             }
           />

@@ -11,7 +11,7 @@ import { StepExpenses } from './StepExpenses';
 import { StepDebts } from './StepDebts';
 import { StepAssets } from './StepAssets';
 import { StepReview } from './StepReview';
-import { encryptCurrentState, saveSnapshot } from '../../crypto';
+import { encryptCurrentState, saveSnapshot, setPassphrase } from '../../crypto';
 import { useAuthStore } from '../../stores/auth';
 
 export function IntakeWizard() {
@@ -41,6 +41,7 @@ export function IntakeWizard() {
       try {
         const payload = await encryptCurrentState(passphrase);
         await saveSnapshot(payload, accessToken);
+        setPassphrase(passphrase);
         setShowPassphrase(false);
         setSaveSuccess(true);
         // Auto-dismiss success after 3 seconds

@@ -71,7 +71,7 @@
   - **Test:** Setup -> verify with valid token. Invalid token rejected. MFA enforcement on protected routes.
   - **Depends on:** 0.2.1
 
-- [ ] **0.2.4 Auth UI**
+- [x] **0.2.4 Auth UI**
   - Pages: Register, Login, .mil Verification, MFA Setup.
   - Zustand auth store: user state, tokens (in memory, not localStorage), auth status.
   - `ProtectedRoute` wrapper component.
@@ -139,7 +139,7 @@
   - **Test:** Round-trip: encrypt -> decrypt === original. Different passphrases -> different ciphertext. Tampered ciphertext -> decryption throws. Performance: < 50ms for typical state.
   - **Depends on:** 0.3.1
 
-- [ ] **0.3.5 Encrypted snapshot sync**
+- [x] **0.3.5 Encrypted snapshot sync**
   - Client: after FSM changes, debounce 5 seconds -> encrypt -> `PUT /store/snapshot`.
   - Server routes: `PUT /store/snapshot`, `GET /store/snapshot`, `DELETE /store/snapshot`.
   - Server stores encrypted blob — no decryption, no inspection.

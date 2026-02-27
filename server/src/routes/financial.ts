@@ -158,4 +158,28 @@ export async function financialRoutes(app: FastifyInstance) {
       return reply.send(payload);
     },
   );
+
+  // DELETE /financial/snapshot — delete encrypted financial state
+  app.delete(
+    '/financial/snapshot',
+    { preHandler: [requireAuth] },
+    async (request, reply) => {
+      const { user } = request as unknown as AuthenticatedRequest;
+
+      const deleted = await db
+        .delete(encryptedSnapshots)
+        .where(eq(encryptedSnapshots.userId, user.userId))
+        .returning({ id: encryptedSnapshots.id });
+
+      if (deleted.length === 0) {
+        return reply.status(404).send({
+          error: 'Not Found',
+          message: 'No financial snapshot found',
+        });
+      }
+
+      auditLog('snapshot_deleted', request, { userId: user.userId });
+      return reply.status(200).send({ message: 'Snapshot deleted' });
+    },
+  );
 }
