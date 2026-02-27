@@ -1,0 +1,10 @@
+{
+  "meta": {
+    "year": 2025,
+    "effectiveDate": "2025-01-01",
+    "source": "DFAS 2025 Basic Allowance for Subsistence",
+    "notes": "Monthly BAS rates in USD. Non-taxable. 1.2% increase from 2024. Not tied to paygrade or dependent status."
+  },
+  "enlisted": 465.77,
+  "officer": 320.78
+}

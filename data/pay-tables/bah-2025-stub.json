@@ -1,0 +1,109 @@
+{
+  "meta": {
+    "year": 2025,
+    "effectiveDate": "2025-01-01",
+    "source": "DoD 2025 Basic Allowance for Housing rates",
+    "notes": "E5 BAH rates in USD by ZIP code. 'with' = with dependents, 'without' = without dependents. Non-taxable. Stub file covering major military installations.",
+    "baselineGrade": "E5"
+  },
+  "92101": {
+    "installation": "Naval Base San Diego",
+    "with": 3987,
+    "without": 3132
+  },
+  "23510": {
+    "installation": "Naval Station Norfolk",
+    "with": 2325,
+    "without": 1869
+  },
+  "28310": {
+    "installation": "Fort Liberty (Bragg)",
+    "with": 1785,
+    "without": 1527
+  },
+  "76544": {
+    "installation": "Fort Cavazos (Hood)",
+    "with": 1581,
+    "without": 1452
+  },
+  "98433": {
+    "installation": "Joint Base Lewis-McChord",
+    "with": 2508,
+    "without": 2013
+  },
+  "32508": {
+    "installation": "NAS Pensacola",
+    "with": 1833,
+    "without": 1629
+  },
+  "80913": {
+    "installation": "Fort Carson / Colorado Springs",
+    "with": 2340,
+    "without": 1875
+  },
+  "31314": {
+    "installation": "Fort Stewart",
+    "with": 2163,
+    "without": 1824
+  },
+  "28547": {
+    "installation": "Camp Lejeune",
+    "with": 1560,
+    "without": 1443
+  },
+  "42223": {
+    "installation": "Fort Campbell",
+    "with": 1812,
+    "without": 1635
+  },
+  "96813": {
+    "installation": "Honolulu / Tripler AMC",
+    "with": 3513,
+    "without": 2682
+  },
+  "79916": {
+    "installation": "Fort Bliss",
+    "with": 1773,
+    "without": 1425
+  },
+  "92278": {
+    "installation": "MCAGCC Twentynine Palms",
+    "with": 2055,
+    "without": 1770
+  },
+  "13602": {
+    "installation": "Fort Drum",
+    "with": 1581,
+    "without": 1323
+  },
+  "80902": {
+    "installation": "Fort Carson",
+    "with": 2340,
+    "without": 1875
+  },
+  "22134": {
+    "installation": "MCB Quantico",
+    "with": 2985,
+    "without": 2421
+  },
+  "31905": {
+    "installation": "Fort Moore (Benning)",
+    "with": 1665,
+    "without": 1434
+  },
+  "92055": {
+    "installation": "Camp Pendleton",
+    "with": 3921,
+    "without": 3084
+  },
+  "96860": {
+    "installation": "Pearl Harbor / JB Pearl Harbor-Hickam",
+    "with": 3513,
+    "without": 2682
+  },
+  "78236": {
+    "installation": "Lackland AFB / JBSA",
+    "with": 1935,
+    "without": 1530
+  }
+}

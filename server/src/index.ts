@@ -2,6 +2,8 @@ import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import cookie from '@fastify/cookie';
 import { config } from './config.js';
+import { registerRateLimit } from './middleware/rate-limit.js';
+import { authRoutes } from './routes/auth.js';
 
 const app = Fastify({
   logger: config.isDev
@@ -15,8 +17,11 @@ await app.register(cors, {
 });
 
 await app.register(cookie);
+await registerRateLimit(app);
 
 app.get('/health', async () => ({ status: 'ok', env: config.env }));
+
+await app.register(authRoutes);
 
 try {
   await app.listen({ port: config.port, host: '0.0.0.0' });
