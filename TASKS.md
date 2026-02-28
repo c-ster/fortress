@@ -349,7 +349,12 @@
   - 23 tests for scales, formatters, dimensions, metric config.
   - **Depends on:** 1.4.4
 
-- [ ] **1.4.6 Simulator controls & UX**
+- [x] **1.4.6 Simulator controls & UX**
+  - `useSimulator` hook: scenario state, debounced 300ms full sim (500 iter), immediate preview (50 iter for slider drag), comparison mode with baseline locking.
+  - `ScenarioControls.tsx`: sliders (TSP %, lifestyle), selects (debt strategy, housing, horizon), number inputs (savings, extra debt payment, BAH delta).
+  - `ComparisonSummary.tsx`: delta metric cards (interest saved, debt-free earlier, extra TSP at retirement) with p50 + p10–p90 range.
+  - `SimulatorPage.tsx`: two-column layout, loading overlay with progress bar, milestone summary, comparison toggle.
+  - `/simulator` route + header nav link added in `App.tsx`. 18 tests for `buildDefaultScenario`/`mergeScenario`.
   - **Depends on:** 1.4.5, 1.3.1
 
 ---

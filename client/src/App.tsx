@@ -10,6 +10,7 @@ import { useAuthStore } from './stores/auth';
 import { useBahPrefetch } from './hooks/useBahPrefetch';
 import { useAutoSave } from './hooks/useAutoSave';
 import { Dashboard } from './pages/Dashboard';
+import { SimulatorPage } from './pages/SimulatorPage';
 
 function Header() {
   const { isAuthenticated, user, logout } = useAuthStore();
@@ -35,6 +36,12 @@ function Header() {
                 className="text-sm text-gray-300 hover:text-white transition-colors"
               >
                 Dashboard
+              </Link>
+              <Link
+                to="/simulator"
+                className="text-sm text-gray-300 hover:text-white transition-colors"
+              >
+                Simulator
               </Link>
               <Link
                 to="/settings"
@@ -131,6 +138,14 @@ export function App() {
             element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/simulator"
+            element={
+              <ProtectedRoute>
+                <SimulatorPage />
               </ProtectedRoute>
             }
           />
