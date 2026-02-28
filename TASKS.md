@@ -320,7 +320,7 @@
 
 ### 1.4 Financial Path Simulator
 
-- [ ] **1.4.1 Simulation core in Web Worker**
+- [x] **1.4.1 Simulation core in Web Worker**
   - Types in `packages/types/src/simulation.ts`: `SimulationScenario`, `MonthlySnapshot`, `SimulationResult`, `PercentileBand`, `MilestoneEstimate`.
   - Core loop in `client/src/simulation/simulator.ts`.
   - Web Worker wrapper in `client/src/simulation/worker.ts`.
