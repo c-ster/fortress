@@ -369,7 +369,12 @@
   - 38 tests covering scheduling, question selection, trajectories, history, question bank.
   - **Depends on:** 0.5.2
 
-- [ ] **1.5.2 Check-in UI**
+- [x] **1.5.2 Check-in UI**
+  - `CheckInBanner.tsx`: navy-themed notification banner when check-in is due, scrolls to section.
+  - `CheckInCard.tsx`: question flow with yes/no buttons, 1–5 scale circles, dollar amount input. Submit/skip actions.
+  - `TrajectoryCard.tsx`: progress bars + trajectory messages for emergency fund, debt, TSP.
+  - `CheckInHistory.tsx`: collapsible list of last 5 completed check-ins.
+  - Dashboard updated: banner above risk score, check-in section after action plan, trajectory + history always visible.
   - **Depends on:** 1.5.1
 
 ---

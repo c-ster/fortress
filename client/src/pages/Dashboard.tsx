@@ -1,12 +1,22 @@
-import { useMemo, useCallback } from 'react';
+import { useMemo, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useFinancialStore } from '../stores/financial-state';
 import { calculateRiskScore } from '../engine/risk-engine';
 import { generateActionPlan, ACTION_PLAN_DISCLAIMER } from '../engine/action-generator';
+import {
+  isCheckInDue,
+  getPendingCheckIn,
+  selectQuestions,
+  calculateTrajectory,
+} from '../engine/check-in-scheduler';
 import { RiskScore } from '../components/dashboard/RiskScore';
 import { FindingCard } from '../components/dashboard/FindingCard';
 import { ActionCard } from '../components/dashboard/ActionCard';
-import type { Action } from '@fortress/types';
+import { CheckInBanner } from '../components/dashboard/CheckInBanner';
+import { CheckInCard } from '../components/dashboard/CheckInCard';
+import { TrajectoryCard } from '../components/dashboard/TrajectoryCard';
+import { CheckInHistory } from '../components/dashboard/CheckInHistory';
+import type { Action, CheckIn } from '@fortress/types';
 
 function DataQualityBanner({ completeness }: { completeness: number }) {
   return (
@@ -93,11 +103,22 @@ function ActionTier({
 }
 
 export function Dashboard() {
-  const { state, setActionStatus } = useFinancialStore();
+  const { state, setActionStatus, recordCheckIn } = useFinancialStore();
+  const checkInRef = useRef<HTMLDivElement>(null);
+
   const assessment = useMemo(() => calculateRiskScore(state), [state]);
   const actionPlan = useMemo(
     () => generateActionPlan(state, assessment),
     [state, assessment],
+  );
+
+  // Check-in state
+  const checkInDue = useMemo(() => isCheckInDue(state.checkIns), [state.checkIns]);
+  const pendingCheckIn = useMemo(() => getPendingCheckIn(state.checkIns), [state.checkIns]);
+  const questions = useMemo(() => selectQuestions(state), [state]);
+  const trajectories = useMemo(
+    () => calculateTrajectory(state, state.checkIns),
+    [state],
   );
 
   const handleStatusChange = useCallback(
@@ -106,6 +127,20 @@ export function Dashboard() {
     },
     [setActionStatus],
   );
+
+  const handleCheckInComplete = useCallback(
+    (checkIn: CheckIn) => recordCheckIn(checkIn),
+    [recordCheckIn],
+  );
+
+  const handleCheckInSkip = useCallback(
+    (checkIn: CheckIn) => recordCheckIn(checkIn),
+    [recordCheckIn],
+  );
+
+  const scrollToCheckIn = useCallback(() => {
+    checkInRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, []);
 
   // Resolve effective status: overlay persisted statuses onto generated actions
   const resolveActions = (actions: Action[]) =>
@@ -131,6 +166,11 @@ export function Dashboard() {
       <p className="text-gray-600 mb-6">
         Your personalized risk score based on current financial data.
       </p>
+
+      {/* Check-in banner (when due) */}
+      {checkInDue && pendingCheckIn && (
+        <CheckInBanner onScrollToCheckIn={scrollToCheckIn} />
+      )}
 
       {assessment.dataQuality < 0.5 && (
         <DataQualityBanner completeness={assessment.dataQuality} />
@@ -170,7 +210,6 @@ export function Dashboard() {
             Action Plan
           </h3>
 
-          {/* Immediate tier */}
           {immediateResolved.length > 0 && (
             <ActionTier
               title="This Week"
@@ -180,7 +219,6 @@ export function Dashboard() {
             />
           )}
 
-          {/* Stabilization tier */}
           {stabilizationResolved.length > 0 && (
             <ActionTier
               title="Next 30 Days"
@@ -190,7 +228,6 @@ export function Dashboard() {
             />
           )}
 
-          {/* Compounding tier */}
           {compoundingResolved.length > 0 && (
             <ActionTier
               title="90-Day Goals"
@@ -200,7 +237,6 @@ export function Dashboard() {
             />
           )}
 
-          {/* Disclaimer — always visible */}
           <div className="mt-6 p-3 bg-gray-50 border border-gray-200 rounded-md">
             <p className="text-xs text-gray-500 leading-relaxed">
               {ACTION_PLAN_DISCLAIMER}
@@ -208,6 +244,27 @@ export function Dashboard() {
           </div>
         </section>
       )}
+
+      {/* Check-In Section */}
+      <section className="mt-8 space-y-4" ref={checkInRef}>
+        {/* Active check-in card (when pending) */}
+        {pendingCheckIn && questions.length > 0 && (
+          <CheckInCard
+            checkIn={pendingCheckIn}
+            questions={questions}
+            onComplete={handleCheckInComplete}
+            onSkip={handleCheckInSkip}
+          />
+        )}
+
+        {/* Trajectory progress (always shown when trajectories exist) */}
+        {trajectories.length > 0 && (
+          <TrajectoryCard trajectories={trajectories} />
+        )}
+
+        {/* Check-in history */}
+        <CheckInHistory checkIns={state.checkIns} />
+      </section>
 
       <div className="mt-8 flex gap-3">
         <Link
