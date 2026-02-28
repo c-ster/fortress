@@ -381,7 +381,11 @@
 
 ### 1.6 Dashboard
 
-- [ ] **1.6.1 Unified dashboard layout**
+- [x] **1.6.1 Unified dashboard layout**
+  - Extracted `DataQualityBanner.tsx`, `ActionTier.tsx` into standalone components.
+  - Added `QuickStats.tsx`: 4 stat cards (emergency fund months, DTI, actions remaining, TSP match) in responsive grid.
+  - Added `SimulatorCta.tsx`: CTA card linking to `/simulator` for feature discoverability.
+  - Dashboard.tsx refactored to orchestrator only (189 lines, down from 280): grid layout with risk score + quick stats, findings, action plan, check-ins, trajectory, simulator CTA.
   - **Depends on:** 0.4.2, 0.5.2, 1.5.2
 
 ---
