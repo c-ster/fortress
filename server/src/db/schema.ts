@@ -61,6 +61,22 @@ export const refreshTokens = identitySchema.table('refresh_tokens', {
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
+// Homefront grants — spouse access to encrypted financial snapshot
+export const homefrontGrants = identitySchema.table('homefront_grants', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  ownerId: uuid('owner_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  spouseEmail: text('spouse_email').notNull(),
+  inviteToken: text('invite_token').notNull().unique(),
+  permission: text('permission').notNull().default('read'),
+  spouseUserId: uuid('spouse_user_id').references(() => users.id),
+  acceptedAt: timestamp('accepted_at', { withTimezone: true }),
+  revokedAt: timestamp('revoked_at', { withTimezone: true }),
+  expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
 // Email verification codes
 export const verificationCodes = identitySchema.table('verification_codes', {
   id: uuid('id').primaryKey().defaultRandom(),
