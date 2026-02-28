@@ -393,7 +393,7 @@
 ## Phase 2: Military Life Events
 
 ### 2.1 PCS Playbook
-- [ ] **2.1.1 PCS calculator** — Depends on: 0.3.6, 0.4.1
+- [x] **2.1.1 PCS calculator** — Depends on: 0.3.6, 0.4.1
 - [ ] **2.1.2 PCS UI (3-phase)** — Depends on: 2.1.1, 1.4.6
 
 ### 2.2 Deployment Playbook

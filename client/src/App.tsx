@@ -11,6 +11,7 @@ import { useBahPrefetch } from './hooks/useBahPrefetch';
 import { useAutoSave } from './hooks/useAutoSave';
 import { Dashboard } from './pages/Dashboard';
 import { SimulatorPage } from './pages/SimulatorPage';
+import { PcsPage } from './pages/PcsPage';
 
 function Header() {
   const { isAuthenticated, user, logout } = useAuthStore();
@@ -42,6 +43,12 @@ function Header() {
                 className="text-sm text-gray-300 hover:text-white transition-colors"
               >
                 Simulator
+              </Link>
+              <Link
+                to="/pcs"
+                className="text-sm text-gray-300 hover:text-white transition-colors"
+              >
+                PCS Planner
               </Link>
               <Link
                 to="/settings"
@@ -146,6 +153,14 @@ export function App() {
             element={
               <ProtectedRoute>
                 <SimulatorPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/pcs"
+            element={
+              <ProtectedRoute>
+                <PcsPage />
               </ProtectedRoute>
             }
           />
