@@ -342,7 +342,11 @@
   - Worker extended to handle 'compare' messages. 9 tests in `comparison.test.ts`.
   - **Depends on:** 1.4.3
 
-- [ ] **1.4.5 Simulator chart (D3.js)**
+- [x] **1.4.5 Simulator chart (D3.js)**
+  - D3.js fan chart with percentile bands (p10-p90, p25-p75) + median line.
+  - 6 components in `client/src/components/simulator/`: chart-types, chart-scales, FanChart, ChartAxes, MilestoneMarkers, SimulatorChart.
+  - Metric selector (5 metrics), responsive sizing, milestone markers with tooltips.
+  - 23 tests for scales, formatters, dimensions, metric config.
   - **Depends on:** 1.4.4
 
 - [ ] **1.4.6 Simulator controls & UX**
