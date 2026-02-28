@@ -1,13 +1,17 @@
 /**
- * Risk scoring engine — Phase 0 (3 rules).
+ * Risk scoring engine — 7 rules, 100 total points.
  *
  * Pure function: no side effects, no Zustand, no React.
  * Reads pre-computed risk metrics from the FinancialState (set by computeDerived).
  *
  * Rules:
- *   1. Emergency Fund  (25% weight) — liquid savings vs essential expenses
+ *   1. Emergency Fund     (25% weight) — liquid savings vs essential expenses
  *   2. High-Interest Debt (20% weight) — debts > 15% APR scaled by income
- *   3. SGLI Gap (15% weight) — binary: dependents + under-coverage
+ *   3. SGLI Gap           (15% weight) — binary: dependents + under-coverage
+ *   4. TSP Match          (15% weight) — BRS contribution vs 5% match threshold
+ *   5. DTI Ratio          (10% weight) — debt payments vs gross income
+ *   6. SCRA Opportunity   (10% weight) — potential savings on pre-service debt
+ *   7. Payday Spike        (5% weight) — expense clustering around paydays
  *
  * Score = max(0, 100 − totalDeducted).  Tier: ≥80 green, 50–79 yellow, <50 red.
  */
@@ -155,12 +159,150 @@ const sgliGapRule: RiskRule = {
   },
 };
 
-// --- Phase 0 rule set ---
+const tspMatchRule: RiskRule = {
+  category: 'tsp_match',
+  weight: 15,
+  evaluate(state) {
+    // Only applies to BRS retirement system
+    if (state.military.retirementSystem !== 'brs') return null;
 
-const PHASE_0_RULES: RiskRule[] = [
+    const { basePay } = state.income;
+    if (basePay === 0) return null; // No income data
+
+    const pct = state.deductions.tspContributionPct;
+    if (pct >= 0.05) return null; // Already capturing full match
+
+    const pts = Math.round(15 * (0.05 - pct) / 0.05);
+    if (pts === 0) return null;
+
+    const severity = pct < 0.01 ? 'critical' : 'warning';
+    const annualLost = basePay * 12 * (0.05 - pct);
+    // 20-year compounded estimate at 7% average growth
+    const compounded20yr = annualLost * ((Math.pow(1.07, 20) - 1) / 0.07);
+
+    return {
+      severity,
+      title: 'TSP Match Not Fully Captured',
+      description:
+        `You're contributing ${(pct * 100).toFixed(1)}% to TSP, but the BRS match ` +
+        'requires 5% to capture the full government match. ' +
+        `You're leaving approximately ${formatCurrencyWhole(annualLost)}/year on the table.`,
+      impact:
+        `Over 20 years, the uncaptured match could grow to ${formatCurrencyWhole(compounded20yr)} ` +
+        'with compounding at 7% average growth.',
+      actionId: 'increase_tsp_contribution',
+      pointsDeducted: pts,
+    };
+  },
+};
+
+const dtiRule: RiskRule = {
+  category: 'debt_to_income',
+  weight: 10,
+  evaluate(state) {
+    const gross = state.income.totalGross;
+    if (gross === 0) return null; // No income data
+
+    const dti = state.risk.debtToIncomeRatio;
+    if (dti <= 0.30) return null; // Healthy
+
+    let pts: number;
+    let severity: 'critical' | 'warning';
+
+    if (dti > 0.40) {
+      pts = 10;
+      severity = 'critical';
+    } else {
+      // 0.30–0.40: linear scale
+      pts = Math.round(10 * (dti - 0.30) / 0.10);
+      severity = 'warning';
+      if (pts === 0) return null;
+    }
+
+    const pctDisplay = (dti * 100).toFixed(0);
+
+    return {
+      severity,
+      title: 'High Debt-to-Income Ratio',
+      description:
+        `Your debt-to-income ratio is ${pctDisplay}%, which exceeds the recommended 30% threshold. ` +
+        'High DTI can be a flag in security clearance reviews and limits financial flexibility.',
+      impact:
+        `You're spending ${formatCurrencyWhole(dti * gross)} of your ` +
+        `${formatCurrencyWhole(gross)}/mo gross income on debt payments.`,
+      actionId: 'reduce_debt_to_income',
+      pointsDeducted: pts,
+    };
+  },
+};
+
+const scraOpportunityRule: RiskRule = {
+  category: 'scra_opportunity',
+  weight: 10,
+  evaluate(state) {
+    const monthlySavings = state.risk.scraOpportunity;
+    if (monthlySavings === 0) return null;
+
+    const ratio = Math.min(monthlySavings / 200, 1.0);
+    const pts = Math.round(10 * ratio);
+    if (pts === 0) return null;
+
+    const severity = monthlySavings >= 100 ? 'critical' : 'warning';
+    const annualSavings = monthlySavings * 12;
+
+    return {
+      severity,
+      title: 'SCRA Rate Reduction Available',
+      description:
+        'The Servicemembers Civil Relief Act (SCRA) can cap interest rates at 6% on pre-service debt. ' +
+        'You have eligible debt that could benefit from this protection.',
+      impact:
+        `Requesting SCRA protection could save ${formatCurrencyWhole(monthlySavings)}/month ` +
+        `(${formatCurrencyWhole(annualSavings)}/year) in interest charges.`,
+      actionId: 'invoke_scra_protection',
+      pointsDeducted: pts,
+    };
+  },
+};
+
+const paydaySpikeRule: RiskRule = {
+  category: 'payday_spike',
+  weight: 5,
+  evaluate(state) {
+    const severity_val = state.risk.paydaySpikeSeverity;
+
+    // Skip if below threshold or no data (default 0)
+    if (severity_val <= 0.5) return null;
+
+    const pts = Math.round(5 * (severity_val - 0.5) / 0.5);
+    if (pts === 0) return null;
+
+    const severity = severity_val >= 0.8 ? 'critical' : 'warning';
+
+    return {
+      severity,
+      title: 'Expense Clustering Around Paydays',
+      description:
+        'A large portion of your expenses are concentrated around paydays, ' +
+        'creating cash flow volatility that increases the risk of overdrafts or missed payments.',
+      impact:
+        'Spreading bills across the month and setting up mid-month allotments can smooth cash flow.',
+      actionId: 'smooth_payday_expenses',
+      pointsDeducted: pts,
+    };
+  },
+};
+
+// --- Rule set (7 rules, 100 total weight) ---
+
+const RULES: RiskRule[] = [
   emergencyFundRule,
   highInterestDebtRule,
   sgliGapRule,
+  tspMatchRule,
+  dtiRule,
+  scraOpportunityRule,
+  paydaySpikeRule,
 ];
 
 // --- Public API ---
@@ -172,7 +314,7 @@ const PHASE_0_RULES: RiskRule[] = [
 export function calculateRiskScore(state: FinancialState): RiskAssessment {
   const findings: RiskFinding[] = [];
 
-  for (const rule of PHASE_0_RULES) {
+  for (const rule of RULES) {
     const result = rule.evaluate(state);
     if (result) {
       findings.push({

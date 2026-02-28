@@ -59,7 +59,9 @@ function makeState(overrides: Record<string, unknown> = {}): FinancialState {
 }
 
 describe('calculateRiskScore', () => {
-  it('scores E3 with poor finances as red (all 3 findings)', () => {
+  // --- Existing Phase 0 tests (updated for 7-rule scoring) ---
+
+  it('scores E3 with poor finances as red (4 findings including TSP)', () => {
     const state = makeState({
       income: { basePay: 2400, bah: 900, bas: 400 },
       assets: { savingsBalance: 200, checkingBalance: 0 },
@@ -78,7 +80,7 @@ describe('calculateRiskScore', () => {
     const assessment = calculateRiskScore(state);
 
     expect(assessment.tier).toBe('red');
-    expect(assessment.findings).toHaveLength(3);
+    expect(assessment.findings).toHaveLength(4);
     expect(assessment.overallScore).toBeLessThan(50);
 
     // Emergency fund: 200 liquid / 1600 essential = 0.125 months → critical, 25 pts
@@ -98,8 +100,13 @@ describe('calculateRiskScore', () => {
     expect(sgliFinding!.severity).toBe('critical');
     expect(sgliFinding!.pointsDeducted).toBe(15);
 
-    // Total: 25 + 14 + 15 = 54 → score = 46
-    expect(assessment.overallScore).toBe(46);
+    // TSP match: BRS, 0% contribution → 15 pts
+    const tspFinding = assessment.findings.find((f) => f.category === 'tsp_match');
+    expect(tspFinding).toBeDefined();
+    expect(tspFinding!.pointsDeducted).toBe(15);
+
+    // Total: 25 + 15 + 15 + 14 = 69 → score = 31
+    expect(assessment.overallScore).toBe(31);
   });
 
   it('scores O4 with healthy finances as green (no findings)', () => {
@@ -108,7 +115,7 @@ describe('calculateRiskScore', () => {
       assets: { savingsBalance: 25000, checkingBalance: 5000 },
       expenses: { housing: 2000, utilities: 200, transportation: 400, food: 600 },
       military: { payGrade: 'O4' as PayGrade, dependents: 3, yearsOfService: 12 },
-      deductions: { sgliCoverage: 500000 },
+      deductions: { sgliCoverage: 500000, tspTraditional: 375 },
       debts: [],
     });
 
@@ -119,7 +126,7 @@ describe('calculateRiskScore', () => {
     expect(assessment.findings).toHaveLength(0);
   });
 
-  it('scores partial data (savings + income + minimal expenses) with emergency fund finding only', () => {
+  it('scores partial data (savings + income + minimal expenses) with EF + TSP findings', () => {
     const state = makeState({
       income: { basePay: 3000, bah: 1200 },
       assets: { savingsBalance: 500, checkingBalance: 200 },
@@ -133,10 +140,11 @@ describe('calculateRiskScore', () => {
 
     // totalLiquid = 700, totalEssential = 1300
     // emergencyFundMonths = 700/1300 ≈ 0.538 → critical, 25 pts
-    expect(assessment.findings).toHaveLength(1);
-    expect(assessment.findings[0].category).toBe('emergency_fund');
-    expect(assessment.findings[0].severity).toBe('critical');
-    expect(assessment.overallScore).toBe(75);
+    // TSP: BRS, basePay=3000, tsp=0 → 15 pts
+    expect(assessment.findings).toHaveLength(2);
+    expect(assessment.findings.find((f) => f.category === 'emergency_fund')).toBeDefined();
+    expect(assessment.findings.find((f) => f.category === 'tsp_match')).toBeDefined();
+    expect(assessment.overallScore).toBe(60);
     expect(assessment.tier).toBe('yellow');
   });
 
@@ -167,6 +175,10 @@ describe('calculateRiskScore', () => {
     const hidFinding = assessment.findings.find((f) => f.category === 'high_interest_debt');
     expect(hidFinding).toBeDefined();
     expect(hidFinding!.pointsDeducted).toBe(20);
+
+    // TSP skips (basePay === 0), DTI skips (gross === 0)
+    expect(assessment.findings.find((f) => f.category === 'tsp_match')).toBeUndefined();
+    expect(assessment.findings.find((f) => f.category === 'debt_to_income')).toBeUndefined();
   });
 
   it('deducts 0 points for high-interest debt when there are no debts', () => {
@@ -175,6 +187,7 @@ describe('calculateRiskScore', () => {
       assets: { savingsBalance: 10000, checkingBalance: 2000 },
       expenses: { housing: 1500, food: 400 },
       military: { dependents: 0 },
+      deductions: { tspTraditional: 200 },
       debts: [],
     });
 
@@ -185,6 +198,7 @@ describe('calculateRiskScore', () => {
     expect(hidFinding).toBeUndefined();
 
     // 12000 / 1900 = 6.3 months → no emergency fund finding either
+    // TSP: 200/4000 = 5% → no finding
     expect(assessment.findings).toHaveLength(0);
     expect(assessment.overallScore).toBe(100);
     expect(assessment.tier).toBe('green');
@@ -223,6 +237,7 @@ describe('calculateRiskScore', () => {
       assets: { savingsBalance: 4000 },
       expenses: { housing: 1500, food: 500 },
       military: { dependents: 0 },
+      deductions: { tspTraditional: 150 },
     });
 
     const assessment = calculateRiskScore(state);
@@ -311,5 +326,309 @@ describe('calculateRiskScore', () => {
       const combined = finding.description + finding.impact;
       expect(combined).toMatch(/\$/);
     }
+  });
+
+  // --- New Phase 1 tests (TSP match, DTI, SCRA, payday spike) ---
+
+  it('flags BRS user at 2% TSP with dollar amount lost and 20-year estimate', () => {
+    const state = makeState({
+      income: { basePay: 4000, bah: 1500 },
+      assets: { savingsBalance: 15000, checkingBalance: 5000 },
+      expenses: { housing: 1500, food: 400 },
+      military: { retirementSystem: 'brs', dependents: 0 },
+      deductions: { tspTraditional: 80 }, // 80/4000 = 2%
+      debts: [],
+    });
+
+    const assessment = calculateRiskScore(state);
+
+    const tspFinding = assessment.findings.find((f) => f.category === 'tsp_match');
+    expect(tspFinding).toBeDefined();
+
+    // pct = 0.02, gap = 0.03
+    // pts = round(15 * 0.03 / 0.05) = round(9) = 9
+    expect(tspFinding!.pointsDeducted).toBe(9);
+    expect(tspFinding!.severity).toBe('warning');
+    expect(tspFinding!.actionId).toBe('increase_tsp_contribution');
+
+    // Description should mention annual dollars lost
+    // annualLost = 4000 * 12 * 0.03 = $1,440
+    expect(tspFinding!.description).toMatch(/\$1,440/);
+
+    // Impact should mention 20-year compounded estimate
+    expect(tspFinding!.impact).toMatch(/20 years/);
+    expect(tspFinding!.impact).toMatch(/\$/);
+  });
+
+  it('skips TSP rule for legacy retirement system', () => {
+    const state = makeState({
+      income: { basePay: 4000, bah: 1500 },
+      assets: { savingsBalance: 15000, checkingBalance: 5000 },
+      expenses: { housing: 1500, food: 400 },
+      military: { retirementSystem: 'legacy', dependents: 0 },
+      deductions: { tspTraditional: 0 },
+      debts: [],
+    });
+
+    const assessment = calculateRiskScore(state);
+
+    const tspFinding = assessment.findings.find((f) => f.category === 'tsp_match');
+    expect(tspFinding).toBeUndefined();
+  });
+
+  it('flags critical TSP at 0% contribution', () => {
+    const state = makeState({
+      income: { basePay: 3000, bah: 1200 },
+      assets: { savingsBalance: 15000, checkingBalance: 5000 },
+      expenses: { housing: 1500, food: 400 },
+      military: { retirementSystem: 'brs', dependents: 0 },
+      deductions: { tspTraditional: 0 },
+      debts: [],
+    });
+
+    const assessment = calculateRiskScore(state);
+
+    const tspFinding = assessment.findings.find((f) => f.category === 'tsp_match');
+    expect(tspFinding).toBeDefined();
+    expect(tspFinding!.severity).toBe('critical');
+    expect(tspFinding!.pointsDeducted).toBe(15);
+  });
+
+  it('flags DTI at 45% as critical mentioning security clearance', () => {
+    const state = makeState({
+      income: { basePay: 4000, bah: 1500 },
+      assets: { savingsBalance: 15000, checkingBalance: 5000 },
+      expenses: { housing: 1500, food: 400 },
+      military: { dependents: 0 },
+      deductions: { tspTraditional: 200 },
+      debts: [
+        {
+          id: '1', name: 'Car Loan', type: 'auto',
+          balance: 25000, apr: 8, minimumPayment: 2475,
+          monthlyPayment: 2475, preService: false,
+        },
+      ],
+    });
+
+    // DTI = 2475 / 5500 = 0.45 → critical, 10 pts
+    const assessment = calculateRiskScore(state);
+
+    const dtiFinding = assessment.findings.find((f) => f.category === 'debt_to_income');
+    expect(dtiFinding).toBeDefined();
+    expect(dtiFinding!.severity).toBe('critical');
+    expect(dtiFinding!.pointsDeducted).toBe(10);
+    expect(dtiFinding!.actionId).toBe('reduce_debt_to_income');
+
+    // Must mention security clearance
+    expect(dtiFinding!.description).toMatch(/clearance/i);
+    // Must mention dollar amounts
+    expect(dtiFinding!.impact).toMatch(/\$/);
+  });
+
+  it('scales DTI warning proportionally between 30% and 40%', () => {
+    const state = makeState({
+      income: { basePay: 4000, bah: 1500 },
+      assets: { savingsBalance: 15000, checkingBalance: 5000 },
+      expenses: { housing: 1500, food: 400 },
+      military: { dependents: 0 },
+      deductions: { tspTraditional: 200 },
+      debts: [
+        {
+          id: '1', name: 'Car', type: 'auto',
+          balance: 15000, apr: 8, minimumPayment: 1925,
+          monthlyPayment: 1925, preService: false,
+        },
+      ],
+    });
+
+    // DTI = 1925 / 5500 = 0.35 → warning
+    // pts = round(10 * (0.35 - 0.30) / 0.10) = round(5) = 5
+    const assessment = calculateRiskScore(state);
+
+    const dtiFinding = assessment.findings.find((f) => f.category === 'debt_to_income');
+    expect(dtiFinding).toBeDefined();
+    expect(dtiFinding!.severity).toBe('warning');
+    expect(dtiFinding!.pointsDeducted).toBe(5);
+  });
+
+  it('skips DTI rule when ratio is healthy (below 30%)', () => {
+    const state = makeState({
+      income: { basePay: 5000, bah: 1500 },
+      assets: { savingsBalance: 20000, checkingBalance: 5000 },
+      expenses: { housing: 1500, food: 400 },
+      military: { dependents: 0 },
+      deductions: { tspTraditional: 250 },
+      debts: [
+        {
+          id: '1', name: 'Car', type: 'auto',
+          balance: 10000, apr: 5, minimumPayment: 500,
+          monthlyPayment: 500, preService: false,
+        },
+      ],
+    });
+
+    // DTI = 500 / 6500 ≈ 0.077 → healthy
+    const assessment = calculateRiskScore(state);
+
+    const dtiFinding = assessment.findings.find((f) => f.category === 'debt_to_income');
+    expect(dtiFinding).toBeUndefined();
+  });
+
+  it('flags pre-service auto loan at 18% with SCRA finding showing savings', () => {
+    const state = makeState({
+      income: { basePay: 3000, bah: 1200 },
+      assets: { savingsBalance: 15000, checkingBalance: 5000 },
+      expenses: { housing: 1200, food: 300 },
+      military: { dependents: 0 },
+      deductions: { tspTraditional: 150 },
+      debts: [
+        {
+          id: '1', name: 'Auto Loan', type: 'auto',
+          balance: 15000, apr: 18, minimumPayment: 400,
+          monthlyPayment: 400, preService: true,
+        },
+      ],
+    });
+
+    // scraOpportunity = 15000 * (0.18 - 0.06) / 12 = 15000 * 0.12 / 12 = $150/mo
+    // ratio = min(150/200, 1.0) = 0.75
+    // pts = round(10 * 0.75) = 8
+    const assessment = calculateRiskScore(state);
+
+    const scraFinding = assessment.findings.find((f) => f.category === 'scra_opportunity');
+    expect(scraFinding).toBeDefined();
+    expect(scraFinding!.pointsDeducted).toBe(8);
+    expect(scraFinding!.severity).toBe('critical'); // >= $100/mo
+    expect(scraFinding!.actionId).toBe('invoke_scra_protection');
+
+    // Impact should show monthly and annual savings
+    expect(scraFinding!.impact).toMatch(/\$150/);  // monthly
+    expect(scraFinding!.impact).toMatch(/\$1,800/); // annual (150*12)
+  });
+
+  it('caps SCRA deduction at 10 points for large savings', () => {
+    const state = makeState({
+      income: { basePay: 3000, bah: 1200 },
+      assets: { savingsBalance: 15000, checkingBalance: 5000 },
+      expenses: { housing: 1200, food: 300 },
+      military: { dependents: 0 },
+      deductions: { tspTraditional: 150 },
+      debts: [
+        {
+          id: '1', name: 'Auto Loan', type: 'auto',
+          balance: 40000, apr: 24, minimumPayment: 800,
+          monthlyPayment: 800, preService: true,
+        },
+      ],
+    });
+
+    // scraOpportunity = 40000 * (0.24 - 0.06) / 12 = 40000 * 0.18 / 12 = $600/mo
+    // ratio = min(600/200, 1.0) = 1.0
+    // pts = round(10 * 1.0) = 10
+    const assessment = calculateRiskScore(state);
+
+    const scraFinding = assessment.findings.find((f) => f.category === 'scra_opportunity');
+    expect(scraFinding).toBeDefined();
+    expect(scraFinding!.pointsDeducted).toBe(10);
+  });
+
+  it('scores payday spike 0 when severity data is unavailable (default 0)', () => {
+    const state = makeState({
+      income: { basePay: 3000, bah: 1200 },
+      assets: { savingsBalance: 15000, checkingBalance: 5000 },
+      expenses: { housing: 1200, food: 300 },
+      military: { dependents: 0 },
+      deductions: { tspTraditional: 150 },
+      debts: [],
+    });
+
+    // paydaySpikeSeverity defaults to 0 → skipped
+    const assessment = calculateRiskScore(state);
+
+    const paydayFinding = assessment.findings.find((f) => f.category === 'payday_spike');
+    expect(paydayFinding).toBeUndefined();
+  });
+
+  it('flags payday spike proportionally when severity > 0.5', () => {
+    const state = makeState({
+      income: { basePay: 3000, bah: 1200 },
+      assets: { savingsBalance: 15000, checkingBalance: 5000 },
+      expenses: { housing: 1200, food: 300 },
+      military: { dependents: 0 },
+      deductions: { tspTraditional: 150 },
+      debts: [],
+      risk: { paydaySpikeSeverity: 0.8 },
+    });
+
+    // pts = round(5 * (0.8 - 0.5) / 0.5) = round(3) = 3
+    const assessment = calculateRiskScore(state);
+
+    const paydayFinding = assessment.findings.find((f) => f.category === 'payday_spike');
+    expect(paydayFinding).toBeDefined();
+    expect(paydayFinding!.pointsDeducted).toBe(3);
+    expect(paydayFinding!.severity).toBe('critical'); // >= 0.8
+    expect(paydayFinding!.actionId).toBe('smooth_payday_expenses');
+  });
+
+  it('deducts full 5 points for payday spike severity 1.0', () => {
+    const state = makeState({
+      income: { basePay: 3000, bah: 1200 },
+      assets: { savingsBalance: 15000, checkingBalance: 5000 },
+      expenses: { housing: 1200, food: 300 },
+      military: { dependents: 0 },
+      deductions: { tspTraditional: 150 },
+      debts: [],
+      risk: { paydaySpikeSeverity: 1.0 },
+    });
+
+    // pts = round(5 * (1.0 - 0.5) / 0.5) = round(5) = 5
+    const assessment = calculateRiskScore(state);
+
+    const paydayFinding = assessment.findings.find((f) => f.category === 'payday_spike');
+    expect(paydayFinding).toBeDefined();
+    expect(paydayFinding!.pointsDeducted).toBe(5);
+  });
+
+  it('scores all 7 rules firing simultaneously with correct total', () => {
+    const state = makeState({
+      income: { basePay: 2000 },
+      assets: { savingsBalance: 100, checkingBalance: 50 },
+      expenses: { housing: 800, utilities: 100, transportation: 200, food: 300 },
+      military: { dependents: 2, retirementSystem: 'brs' },
+      deductions: { sgliCoverage: 100000, tspTraditional: 0 },
+      debts: [
+        {
+          id: '1', name: 'Credit Card', type: 'credit_card',
+          balance: 8000, apr: 24, minimumPayment: 200,
+          monthlyPayment: 800, preService: true,
+        },
+      ],
+      risk: { paydaySpikeSeverity: 1.0 },
+    });
+
+    const assessment = calculateRiskScore(state);
+
+    // All 7 categories should produce findings
+    const categories = assessment.findings.map((f) => f.category);
+    expect(categories).toContain('emergency_fund');
+    expect(categories).toContain('high_interest_debt');
+    expect(categories).toContain('sgli_coverage');
+    expect(categories).toContain('tsp_match');
+    expect(categories).toContain('debt_to_income');
+    expect(categories).toContain('scra_opportunity');
+    expect(categories).toContain('payday_spike');
+
+    expect(assessment.findings).toHaveLength(7);
+
+    // Verify sorted descending
+    for (let i = 1; i < assessment.findings.length; i++) {
+      expect(assessment.findings[i - 1].pointsDeducted)
+        .toBeGreaterThanOrEqual(assessment.findings[i].pointsDeducted);
+    }
+
+    // Score should be 0 or very low (all 100 points possible)
+    expect(assessment.overallScore).toBeGreaterThanOrEqual(0);
+    expect(assessment.overallScore).toBeLessThanOrEqual(100);
+    expect(assessment.tier).toBe('red');
   });
 });

@@ -284,7 +284,7 @@
 
 ### 1.2 Full Risk Engine
 
-- [ ] **1.2.1 Extend risk engine to 7 rules**
+- [x] **1.2.1 Extend risk engine to 7 rules**
   - ADD to existing `calculateRiskScore` in `client/src/engine/risk-engine.ts`. Do NOT rewrite.
   - New rules:
     4. **TSP match** (15%): `tspContributionPct` vs 0.05. Points = `15 * (0.05 - pct) / 0.05`. Calculate annual match dollars lost. Include 20-year compounded estimate in impact string.
