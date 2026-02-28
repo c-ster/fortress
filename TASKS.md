@@ -361,7 +361,12 @@
 
 ### 1.5 Behavioral Check-Ins
 
-- [ ] **1.5.1 Check-in scheduling & data model**
+- [x] **1.5.1 Check-in scheduling & data model**
+  - Types: `CheckIn`, `CheckInQuestion`, `CheckInResponse`, `TrajectoryEstimate` in `packages/types/src/check-ins.ts`.
+  - Extended `FinancialState` with `checkIns: CheckIn[]` (encrypted in FSM, auto-saved).
+  - `check-in-scheduler.ts`: scheduling (2nd/16th), 10-question bank across 5 categories, risk-prioritized question selection, trajectory calculator (emergency fund, debt, TSP).
+  - Zustand `recordCheckIn` method for persisting check-in responses.
+  - 38 tests covering scheduling, question selection, trajectories, history, question bank.
   - **Depends on:** 0.5.2
 
 - [ ] **1.5.2 Check-in UI**

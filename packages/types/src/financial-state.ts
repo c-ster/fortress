@@ -1,3 +1,5 @@
+import type { CheckIn } from './check-ins';
+
 export type PayGrade =
   | 'E1' | 'E2' | 'E3' | 'E4' | 'E5' | 'E6' | 'E7' | 'E8' | 'E9'
   | 'O1' | 'O1E' | 'O2' | 'O2E' | 'O3' | 'O3E' | 'O4' | 'O5'
@@ -101,6 +103,8 @@ export interface FinancialState {
   };
 
   actionStatuses: Record<string, 'pending' | 'completed' | 'skipped' | 'deferred'>;
+
+  checkIns: CheckIn[];
 }
 
 // --- LES OCR types ---

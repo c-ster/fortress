@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { FinancialState, Debt, Allotment, PayGrade, LESFieldResult } from '@fortress/types';
+import type { FinancialState, Debt, Allotment, PayGrade, LESFieldResult, CheckIn } from '@fortress/types';
 
 function defaultState(): FinancialState {
   return {
@@ -37,6 +37,7 @@ function defaultState(): FinancialState {
       completeness: 0, confidenceScores: {},
     },
     actionStatuses: {},
+    checkIns: [],
   };
 }
 
@@ -127,6 +128,7 @@ interface FinancialStateStore {
   removeAllotment: (id: string) => void;
   setPaydaySpikeSeverity: (severity: number) => void;
   setActionStatus: (actionId: string, status: 'pending' | 'completed' | 'skipped' | 'deferred') => void;
+  recordCheckIn: (checkIn: CheckIn) => void;
   applyLESData: (fields: LESFieldResult[]) => void;
   hydrate: (state: FinancialState) => void;
   reset: () => void;
@@ -230,6 +232,18 @@ export const useFinancialStore = create<FinancialStateStore>((set) => ({
         actionStatuses: { ...store.state.actionStatuses, [actionId]: status },
       }),
     })),
+
+  recordCheckIn: (checkIn) =>
+    set((store) => {
+      const existing = store.state.checkIns;
+      const idx = existing.findIndex((c) => c.id === checkIn.id);
+      const updated = idx >= 0
+        ? existing.map((c, i) => (i === idx ? checkIn : c))
+        : [...existing, checkIn];
+      return {
+        state: computeDerived({ ...store.state, checkIns: updated }),
+      };
+    }),
 
   applyLESData: (fields) =>
     set((store) => {

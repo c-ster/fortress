@@ -3,3 +3,4 @@ export * from './risk';
 export * from './actions';
 export * from './simulation';
 export * from './api';
+export * from './check-ins';
