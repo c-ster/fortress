@@ -12,6 +12,7 @@ import { useAutoSave } from './hooks/useAutoSave';
 import { Dashboard } from './pages/Dashboard';
 import { SimulatorPage } from './pages/SimulatorPage';
 import { PcsPage } from './pages/PcsPage';
+import { DeploymentPage } from './pages/DeploymentPage';
 
 function Header() {
   const { isAuthenticated, user, logout } = useAuthStore();
@@ -49,6 +50,12 @@ function Header() {
                 className="text-sm text-gray-300 hover:text-white transition-colors"
               >
                 PCS Planner
+              </Link>
+              <Link
+                to="/deployment"
+                className="text-sm text-gray-300 hover:text-white transition-colors"
+              >
+                Deployment
               </Link>
               <Link
                 to="/settings"
@@ -161,6 +168,14 @@ export function App() {
             element={
               <ProtectedRoute>
                 <PcsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/deployment"
+            element={
+              <ProtectedRoute>
+                <DeploymentPage />
               </ProtectedRoute>
             }
           />
