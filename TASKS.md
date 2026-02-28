@@ -304,7 +304,7 @@
 
 ### 1.3 Full Action Plan
 
-- [ ] **1.3.1 Extend action plan to 30/90-day tiers**
+- [x] **1.3.1 Extend action plan to 30/90-day tiers**
   - ADD stabilization (30-day, medium) and compounding (90-day, hard) tiers to existing generator.
   - New generators:
     - `tsp_match` -> "Increase TSP contribution to 5% via myPay" (easy/immediate if small gap, medium if large gap)

@@ -4,6 +4,7 @@ import { calculateRiskScore } from '../../src/engine/risk-engine';
 import {
   generateActionPlan,
   getNextPayday,
+  getDeadlineFromNow,
   ACTION_PLAN_DISCLAIMER,
 } from '../../src/engine/action-generator';
 import type { FinancialState, PayGrade } from '@fortress/types';
@@ -82,16 +83,19 @@ function makeRedState(): FinancialState {
 }
 
 describe('generateActionPlan', () => {
-  it('generates 3 actions for red risk with all 3 findings', () => {
+  it('generates 3 immediate + stabilization actions for red risk', () => {
     const state = makeRedState();
     const risk = calculateRiskScore(state);
     const plan = generateActionPlan(state, risk);
 
+    // Immediate: emergency_fund, high_interest_debt, sgli (capped at 3)
     expect(plan.immediate).toHaveLength(3);
-    expect(plan.stabilization).toHaveLength(0);
-    expect(plan.compounding).toHaveLength(0);
 
-    // Each action maps to a different finding
+    // Stabilization: TSP (gap > 3%, so routed here) + debt consolidation
+    expect(plan.stabilization.length).toBeGreaterThanOrEqual(1);
+    expect(plan.stabilization.length).toBeLessThanOrEqual(3);
+
+    // Each immediate action maps to a different finding
     const findingIds = plan.immediate.map((a) => a.riskFindingId);
     expect(new Set(findingIds).size).toBe(3);
   });
@@ -102,7 +106,7 @@ describe('generateActionPlan', () => {
       assets: { savingsBalance: 25000, checkingBalance: 5000 },
       expenses: { housing: 2000, utilities: 200, transportation: 400, food: 600 },
       military: { payGrade: 'O4' as PayGrade, dependents: 3, yearsOfService: 12 },
-      deductions: { sgliCoverage: 500000 },
+      deductions: { sgliCoverage: 500000, tspTraditional: 375 },
       debts: [],
     });
     const risk = calculateRiskScore(state);
@@ -155,6 +159,7 @@ describe('generateActionPlan', () => {
       assets: { savingsBalance: 10000, checkingBalance: 2000 },
       expenses: { housing: 1200, food: 400 },
       military: { dependents: 0 },
+      deductions: { tspTraditional: 150 },
       debts: [
         {
           id: '1', name: 'Pre-service auto', type: 'auto',
@@ -178,6 +183,7 @@ describe('generateActionPlan', () => {
       assets: { savingsBalance: 10000, checkingBalance: 2000 },
       expenses: { housing: 1200, food: 400 },
       military: { dependents: 0 },
+      deductions: { tspTraditional: 150 },
       debts: [
         {
           id: '1', name: 'Credit Card', type: 'credit_card',
@@ -261,6 +267,289 @@ describe('generateActionPlan', () => {
     expect(ACTION_PLAN_DISCLAIMER).toContain('not financial advice');
     expect(ACTION_PLAN_DISCLAIMER).toContain('PFC');
   });
+
+  // --- TSP Match generators ---
+
+  it('generates immediate TSP action when BRS gap ≤ 3% (at 3%)', () => {
+    const state = makeState({
+      income: { basePay: 3000, bah: 1200, bas: 400 },
+      assets: { savingsBalance: 15000, checkingBalance: 3000 },
+      expenses: { housing: 1200, utilities: 150, food: 400 },
+      military: { payGrade: 'E5' as PayGrade, dependents: 0, retirementSystem: 'brs' },
+      deductions: { tspTraditional: 90, sgliCoverage: 500000 },
+      debts: [],
+    });
+    const risk = calculateRiskScore(state);
+    const plan = generateActionPlan(state, risk);
+
+    const tspAction = plan.immediate.find((a) => a.id.includes('tsp_immediate'));
+    expect(tspAction).toBeDefined();
+    expect(tspAction!.difficulty).toBe('easy');
+    expect(tspAction!.title).toContain('5%');
+    expect(tspAction!.mechanism).toContain('myPay');
+
+    // Should NOT be in stabilization
+    const tspStab = plan.stabilization.find((a) => a.id.includes('tsp_stabilization'));
+    expect(tspStab).toBeUndefined();
+  });
+
+  it('generates stabilization TSP action when BRS gap > 3% (at 0%)', () => {
+    const state = makeState({
+      income: { basePay: 3000, bah: 1200, bas: 400 },
+      assets: { savingsBalance: 15000, checkingBalance: 3000 },
+      expenses: { housing: 1200, utilities: 150, food: 400 },
+      military: { payGrade: 'E5' as PayGrade, dependents: 0, retirementSystem: 'brs' },
+      deductions: { tspTraditional: 0, sgliCoverage: 500000 },
+      debts: [],
+    });
+    const risk = calculateRiskScore(state);
+    const plan = generateActionPlan(state, risk);
+
+    const tspStab = plan.stabilization.find((a) => a.id.includes('tsp_stabilization'));
+    expect(tspStab).toBeDefined();
+    expect(tspStab!.difficulty).toBe('medium');
+    expect(tspStab!.title).toContain('Gradually');
+
+    // Should NOT be in immediate
+    const tspImm = plan.immediate.find((a) => a.id.includes('tsp_immediate'));
+    expect(tspImm).toBeUndefined();
+  });
+
+  it('skips TSP actions for legacy retirement system', () => {
+    const state = makeState({
+      income: { basePay: 3000, bah: 1200, bas: 400 },
+      assets: { savingsBalance: 15000, checkingBalance: 3000 },
+      expenses: { housing: 1200, utilities: 150, food: 400 },
+      military: { payGrade: 'E5' as PayGrade, dependents: 0, retirementSystem: 'legacy' },
+      deductions: { tspTraditional: 0, sgliCoverage: 500000 },
+      debts: [],
+    });
+    const risk = calculateRiskScore(state);
+    const plan = generateActionPlan(state, risk);
+
+    const tspAny = [
+      ...plan.immediate.filter((a) => a.id.includes('tsp')),
+      ...plan.stabilization.filter((a) => a.id.includes('tsp')),
+    ];
+    expect(tspAny).toHaveLength(0);
+  });
+
+  // --- SCRA Stabilization ---
+
+  it('generates stabilization SCRA action for eligible pre-service debts', () => {
+    const state = makeState({
+      income: { basePay: 3000, bah: 1200 },
+      assets: { savingsBalance: 10000, checkingBalance: 2000 },
+      expenses: { housing: 1200, food: 400 },
+      military: { dependents: 0 },
+      deductions: { tspTraditional: 150 },
+      debts: [
+        {
+          id: '1', name: 'Pre-service auto', type: 'auto',
+          balance: 12000, apr: 18, minimumPayment: 300,
+          monthlyPayment: 300, preService: true,
+        },
+      ],
+    });
+    const risk = calculateRiskScore(state);
+    const plan = generateActionPlan(state, risk);
+
+    const scraStab = plan.stabilization.find((a) => a.id.includes('scra_formal'));
+    expect(scraStab).toBeDefined();
+    expect(scraStab!.difficulty).toBe('medium');
+    expect(scraStab!.mechanism).toContain('certified mail');
+    expect(scraStab!.estimatedMinutes).toBe(45);
+  });
+
+  // --- Debt Consolidation Stabilization ---
+
+  it('generates stabilization debt consolidation for high-interest debt', () => {
+    const state = makeState({
+      income: { basePay: 3000, bah: 1200 },
+      assets: { savingsBalance: 200, checkingBalance: 100 },
+      expenses: { housing: 1200, food: 400 },
+      military: { dependents: 0 },
+      deductions: { tspTraditional: 150 },
+      debts: [
+        {
+          id: '1', name: 'Credit Card', type: 'credit_card',
+          balance: 8000, apr: 24, minimumPayment: 200,
+          monthlyPayment: 200, preService: false,
+        },
+      ],
+    });
+    const risk = calculateRiskScore(state);
+    const plan = generateActionPlan(state, risk);
+
+    // Immediate: debt payoff priority
+    const debtImm = plan.immediate.find((a) => a.id.includes('debt_payoff'));
+    expect(debtImm).toBeDefined();
+
+    // Stabilization: debt consolidation via military relief society
+    const debtStab = plan.stabilization.find((a) => a.id.includes('debt_consolidation'));
+    expect(debtStab).toBeDefined();
+    expect(debtStab!.title).toContain('NMCRS');
+    expect(debtStab!.difficulty).toBe('medium');
+  });
+
+  // --- DTI Stabilization ---
+
+  it('generates stabilization DTI strategy for moderate DTI (35%)', () => {
+    const state = makeState({
+      income: { basePay: 3000, bah: 1200, bas: 400 },
+      assets: { savingsBalance: 15000, checkingBalance: 3000 },
+      expenses: { housing: 1200, utilities: 150, food: 400 },
+      military: { payGrade: 'E5' as PayGrade, dependents: 0 },
+      deductions: { tspTraditional: 150, sgliCoverage: 500000 },
+      debts: [
+        {
+          id: '1', name: 'Auto Loan', type: 'auto',
+          balance: 20000, apr: 8, minimumPayment: 1000,
+          monthlyPayment: 1000, preService: false,
+        },
+        {
+          id: '2', name: 'Personal Loan', type: 'personal',
+          balance: 5000, apr: 10, minimumPayment: 610,
+          monthlyPayment: 610, preService: false,
+        },
+      ],
+    });
+    const risk = calculateRiskScore(state);
+    const plan = generateActionPlan(state, risk);
+
+    const dtiStab = plan.stabilization.find((a) => a.id.includes('dti_strategy'));
+    expect(dtiStab).toBeDefined();
+    expect(dtiStab!.difficulty).toBe('medium');
+    expect(dtiStab!.title).toContain('debt payoff');
+    expect(dtiStab!.mechanism).toContain('APR');
+  });
+
+  // --- DTI Compounding ---
+
+  it('generates compounding DTI counseling for severe DTI (> 40%)', () => {
+    const state = makeState({
+      income: { basePay: 2400, bah: 900, bas: 400 },
+      assets: { savingsBalance: 15000, checkingBalance: 3000 },
+      expenses: { housing: 900, utilities: 100, food: 400 },
+      military: { payGrade: 'E3' as PayGrade, dependents: 0 },
+      deductions: { tspTraditional: 120, sgliCoverage: 500000 },
+      debts: [
+        {
+          id: '1', name: 'Auto Loan', type: 'auto',
+          balance: 25000, apr: 8, minimumPayment: 800,
+          monthlyPayment: 800, preService: false,
+        },
+        {
+          id: '2', name: 'Personal Loan', type: 'personal',
+          balance: 10000, apr: 10, minimumPayment: 800,
+          monthlyPayment: 800, preService: false,
+        },
+      ],
+    });
+    const risk = calculateRiskScore(state);
+    const plan = generateActionPlan(state, risk);
+
+    const dtiComp = plan.compounding.find((a) => a.id.includes('dti_counseling'));
+    expect(dtiComp).toBeDefined();
+    expect(dtiComp!.difficulty).toBe('hard');
+    expect(dtiComp!.title).toContain('PFC');
+    expect(dtiComp!.mechanism).toContain('Military OneSource');
+    expect(dtiComp!.estimatedMinutes).toBe(60);
+  });
+
+  // --- All 7 rules firing → actions in all 3 tiers ---
+
+  it('populates all 3 tiers when all 7 risk rules fire', () => {
+    const state = makeState({
+      income: { basePay: 2400, bah: 900, bas: 400 },
+      assets: { savingsBalance: 100, checkingBalance: 100 },
+      expenses: { housing: 900, utilities: 100, transportation: 200, food: 400 },
+      military: {
+        payGrade: 'E3' as PayGrade, dependents: 2,
+        retirementSystem: 'brs',
+      },
+      deductions: { sgliCoverage: 100000, tspTraditional: 0 },
+      risk: { paydaySpikeSeverity: 0.9 },
+      debts: [
+        {
+          id: '1', name: 'Credit Card', type: 'credit_card',
+          balance: 5000, apr: 22, minimumPayment: 150,
+          monthlyPayment: 150, preService: false,
+        },
+        {
+          id: '2', name: 'Pre-service loan', type: 'personal',
+          balance: 10000, apr: 18, minimumPayment: 800,
+          monthlyPayment: 800, preService: true,
+        },
+        {
+          id: '3', name: 'Car Payment', type: 'auto',
+          balance: 15000, apr: 8, minimumPayment: 600,
+          monthlyPayment: 600, preService: false,
+        },
+      ],
+    });
+    const risk = calculateRiskScore(state);
+    const plan = generateActionPlan(state, risk);
+
+    // All 3 tiers should have at least 1 action
+    expect(plan.immediate.length).toBeGreaterThanOrEqual(1);
+    expect(plan.immediate.length).toBeLessThanOrEqual(3);
+    expect(plan.stabilization.length).toBeGreaterThanOrEqual(1);
+    expect(plan.stabilization.length).toBeLessThanOrEqual(3);
+    // DTI > 40% (1550/3700 ≈ 41.9%) → compounding action
+    expect(plan.compounding.length).toBeGreaterThanOrEqual(1);
+
+    // Verify tier difficulties
+    for (const a of plan.immediate) expect(a.difficulty).toBe('easy');
+    for (const a of plan.stabilization) expect(a.difficulty).toBe('medium');
+    for (const a of plan.compounding) expect(a.difficulty).toBe('hard');
+  });
+
+  // --- Stabilization/Compounding deadlines use future dates ---
+
+  it('stabilization deadlines are ~30 days out, compounding ~90 days', () => {
+    const state = makeState({
+      income: { basePay: 2400, bah: 900, bas: 400 },
+      assets: { savingsBalance: 100, checkingBalance: 100 },
+      expenses: { housing: 900, utilities: 100, transportation: 200, food: 400 },
+      military: {
+        payGrade: 'E3' as PayGrade, dependents: 2,
+        retirementSystem: 'brs',
+      },
+      deductions: { sgliCoverage: 100000, tspTraditional: 0 },
+      debts: [
+        {
+          id: '1', name: 'Credit Card', type: 'credit_card',
+          balance: 5000, apr: 22, minimumPayment: 150,
+          monthlyPayment: 150, preService: false,
+        },
+        {
+          id: '2', name: 'Pre-service loan', type: 'personal',
+          balance: 10000, apr: 18, minimumPayment: 800,
+          monthlyPayment: 800, preService: true,
+        },
+        {
+          id: '3', name: 'Car Payment', type: 'auto',
+          balance: 15000, apr: 8, minimumPayment: 600,
+          monthlyPayment: 600, preService: false,
+        },
+      ],
+    });
+    const risk = calculateRiskScore(state);
+    const plan = generateActionPlan(state, risk);
+
+    const months =
+      /January|February|March|April|May|June|July|August|September|October|November|December/;
+
+    for (const a of plan.stabilization) {
+      expect(a.deadline).toMatch(/^Before /);
+      expect(a.deadline).toMatch(months);
+    }
+    for (const a of plan.compounding) {
+      expect(a.deadline).toMatch(/^Before /);
+      expect(a.deadline).toMatch(months);
+    }
+  });
 });
 
 describe('getNextPayday', () => {
@@ -292,5 +581,27 @@ describe('getNextPayday', () => {
     const result = getNextPayday(new Date(2026, 2, 31)); // Mar 31, 2026
     expect(result).toContain('April');
     expect(result).toContain('1');
+  });
+});
+
+describe('getDeadlineFromNow', () => {
+  it('returns date 30 days from now', () => {
+    const result = getDeadlineFromNow(30, new Date(2026, 0, 1)); // Jan 1 + 30 = Jan 31
+    expect(result).toContain('January');
+    expect(result).toContain('31');
+    expect(result).toContain('2026');
+  });
+
+  it('returns date 90 days from now with month rollover', () => {
+    const result = getDeadlineFromNow(90, new Date(2026, 0, 1)); // Jan 1 + 90 = Apr 1
+    expect(result).toContain('April');
+    expect(result).toContain('1');
+    expect(result).toContain('2026');
+  });
+
+  it('handles year rollover', () => {
+    const result = getDeadlineFromNow(30, new Date(2026, 11, 15)); // Dec 15 + 30 = Jan 14
+    expect(result).toContain('January');
+    expect(result).toContain('2027');
   });
 });

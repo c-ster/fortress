@@ -33,6 +33,65 @@ function DataQualityBanner({ completeness }: { completeness: number }) {
   );
 }
 
+function ActionTier({
+  title,
+  subtitle,
+  actions,
+  onStatusChange,
+}: {
+  title: string;
+  subtitle: string;
+  actions: Action[];
+  onStatusChange: (actionId: string, status: Action['status']) => void;
+}) {
+  const active = actions.filter(
+    (a) => a.status === 'pending' || a.status === 'deferred',
+  );
+  const completed = actions.filter(
+    (a) => a.status === 'completed' || a.status === 'skipped',
+  );
+
+  return (
+    <div className="mb-6">
+      <h4 className="text-base font-semibold text-fortress-navy mb-0.5">
+        {title}{' '}
+        <span className="text-sm font-normal text-gray-400">
+          ({active.length} remaining)
+        </span>
+      </h4>
+      <p className="text-sm text-gray-500 mb-3">{subtitle}</p>
+
+      <div className="space-y-3">
+        {active.map((action) => (
+          <ActionCard
+            key={action.id}
+            action={action}
+            onStatusChange={onStatusChange}
+          />
+        ))}
+      </div>
+
+      {completed.length > 0 && (
+        <div className="mt-3">
+          <p className="text-xs text-gray-400 font-medium uppercase tracking-wider mb-2">
+            Completed / Skipped ({completed.length})
+          </p>
+          <div className="space-y-2">
+            {completed.map((action) => (
+              <ActionCard
+                key={action.id}
+                action={action}
+                onStatusChange={onStatusChange}
+                muted
+              />
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function Dashboard() {
   const { state, setActionStatus } = useFinancialStore();
   const assessment = useMemo(() => calculateRiskScore(state), [state]);
@@ -49,17 +108,20 @@ export function Dashboard() {
   );
 
   // Resolve effective status: overlay persisted statuses onto generated actions
-  const allActions = actionPlan.immediate;
-  const resolvedActions = allActions.map((action) => ({
-    ...action,
-    status: state.actionStatuses[action.id] ?? action.status,
-  }));
-  const activeActions = resolvedActions.filter(
-    (a) => a.status === 'pending' || a.status === 'deferred',
-  );
-  const completedActions = resolvedActions.filter(
-    (a) => a.status === 'completed' || a.status === 'skipped',
-  );
+  const resolveActions = (actions: Action[]) =>
+    actions.map((action) => ({
+      ...action,
+      status: state.actionStatuses[action.id] ?? action.status,
+    }));
+
+  const immediateResolved = resolveActions(actionPlan.immediate);
+  const stabilizationResolved = resolveActions(actionPlan.stabilization);
+  const compoundingResolved = resolveActions(actionPlan.compounding);
+
+  const totalActions =
+    actionPlan.immediate.length +
+    actionPlan.stabilization.length +
+    actionPlan.compounding.length;
 
   return (
     <div>
@@ -102,46 +164,40 @@ export function Dashboard() {
       </section>
 
       {/* Action Plan Section */}
-      {allActions.length > 0 && (
+      {totalActions > 0 && (
         <section className="mt-8">
-          <h3 className="text-lg font-semibold text-fortress-navy mb-1">
-            Action Plan{' '}
-            <span className="text-sm font-normal text-gray-400">
-              ({activeActions.length} remaining)
-            </span>
+          <h3 className="text-lg font-semibold text-fortress-navy mb-4">
+            Action Plan
           </h3>
-          <p className="text-sm text-gray-500 mb-4">
-            Quick wins to improve your financial readiness this week.
-          </p>
 
-          {/* Active actions */}
-          <div className="space-y-3">
-            {activeActions.map((action) => (
-              <ActionCard
-                key={action.id}
-                action={action}
-                onStatusChange={handleStatusChange}
-              />
-            ))}
-          </div>
+          {/* Immediate tier */}
+          {immediateResolved.length > 0 && (
+            <ActionTier
+              title="This Week"
+              subtitle="Quick wins to improve your financial readiness in the next 7 days."
+              actions={immediateResolved}
+              onStatusChange={handleStatusChange}
+            />
+          )}
 
-          {/* Completed / Skipped actions */}
-          {completedActions.length > 0 && (
-            <div className="mt-4">
-              <p className="text-xs text-gray-400 font-medium uppercase tracking-wider mb-2">
-                Completed / Skipped ({completedActions.length})
-              </p>
-              <div className="space-y-2">
-                {completedActions.map((action) => (
-                  <ActionCard
-                    key={action.id}
-                    action={action}
-                    onStatusChange={handleStatusChange}
-                    muted
-                  />
-                ))}
-              </div>
-            </div>
+          {/* Stabilization tier */}
+          {stabilizationResolved.length > 0 && (
+            <ActionTier
+              title="Next 30 Days"
+              subtitle="Medium-effort steps to stabilize your financial position."
+              actions={stabilizationResolved}
+              onStatusChange={handleStatusChange}
+            />
+          )}
+
+          {/* Compounding tier */}
+          {compoundingResolved.length > 0 && (
+            <ActionTier
+              title="90-Day Goals"
+              subtitle="Longer-term actions for lasting financial improvement."
+              actions={compoundingResolved}
+              onStatusChange={handleStatusChange}
+            />
           )}
 
           {/* Disclaimer — always visible */}

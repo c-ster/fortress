@@ -1,15 +1,24 @@
 /**
- * Action plan generator — Phase 0 (immediate tier only).
+ * Action plan generator — 3-tier action plan.
  *
  * Pure function: no side effects, no Zustand, no React.
  * Maps risk findings to concrete, actionable steps with specific mechanisms.
  *
- * Generators:
- *   1. Emergency Fund → savings allotment via myPay
- *   2. High-Interest Debt → SCRA invocation (if eligible) or debt payoff priority
- *   3. SGLI Gap → coverage increase via milConnect/SOES
+ * Tiers:
+ *   Immediate (7-day, easy, max 3):
+ *     - Emergency Fund → savings allotment via myPay
+ *     - High-Interest Debt → SCRA invocation or debt payoff priority
+ *     - SGLI Gap → coverage increase via milConnect/SOES
+ *     - TSP Match → increase to 5% on myPay (when gap ≤ 3%)
  *
- * Max 3 actions in the immediate tier. stabilization/compounding reserved for Phase 1.
+ *   Stabilization (30-day, medium, max 3):
+ *     - TSP Match → gradual increase to 5% (when gap > 3%)
+ *     - SCRA Opportunity → formal SCRA letter to lenders
+ *     - High-Interest Debt → NMCRS/AFAS debt consolidation
+ *     - Debt-to-Income → debt payoff priority plan (DTI 30–50%)
+ *
+ *   Compounding (90-day, hard, max 3):
+ *     - Debt-to-Income → professional financial counseling (DTI > 40%)
  */
 
 import type {
@@ -29,7 +38,7 @@ export const ACTION_PLAN_DISCLAIMER =
   'Fortress provides financial planning tools, not financial advice. ' +
   'Consult your installation PFC or a licensed financial advisor for personalized guidance.';
 
-const MAX_IMMEDIATE_ACTIONS = 3;
+const MAX_TIER_ACTIONS = 3;
 
 // --- Types ---
 
@@ -61,6 +70,22 @@ export function getNextPayday(from: Date = new Date()): string {
     year: 'numeric',
   });
 }
+
+/**
+ * Compute a deadline N days from now, formatted as a locale date string.
+ * Exported for testability.
+ */
+export function getDeadlineFromNow(days: number, from: Date = new Date()): string {
+  const target = new Date(from.getTime());
+  target.setDate(target.getDate() + days);
+  return target.toLocaleDateString('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  });
+}
+
+// --- Immediate Generators (7-day, easy) ---
 
 // --- Generator 1: Emergency Fund → Savings Allotment ---
 
@@ -219,13 +244,272 @@ function generateSgliAction(
   };
 }
 
-// --- Generator registry ---
+// --- Generator 4: TSP Match → Immediate (small gap ≤ 3%) ---
 
-const GENERATORS: Partial<Record<RiskCategory, ActionGenerator>> = {
+function generateTspImmediateAction(
+  finding: RiskFinding,
+  state: FinancialState,
+): Action | null {
+  if (state.military.retirementSystem !== 'brs') return null;
+  const { basePay } = state.income;
+  if (basePay === 0) return null;
+
+  const pct = state.deductions.tspContributionPct;
+  const gap = 0.05 - pct;
+
+  // Only immediate tier when gap ≤ 3% (i.e. already at 2%+)
+  if (gap > 0.03 || gap <= 0) return null;
+
+  const monthlyIncrease = Math.round(basePay * gap);
+  const annualMatch = Math.round(basePay * 12 * gap);
+  const compounded20yr = Math.round(annualMatch * ((Math.pow(1.07, 20) - 1) / 0.07));
+  const deadline = getNextPayday();
+
+  return {
+    id: `action_tsp_immediate_${finding.id}`,
+    riskFindingId: finding.id,
+    title: 'Increase TSP contribution to 5% on myPay',
+    description:
+      `You're contributing ${(pct * 100).toFixed(1)}% to TSP. Increase to 5% to capture ` +
+      `the full BRS government match. This adds ${formatCurrencyWhole(monthlyIncrease)}/month ` +
+      'to your retirement savings.',
+    mechanism: 'myPay > TSP Contributions > Traditional/Roth > Set to 5%',
+    amount: monthlyIncrease,
+    deadline: `Before ${deadline}`,
+    estimatedImpact:
+      `Captures ${formatCurrencyWhole(annualMatch)}/year in government match, ` +
+      `potentially growing to ${formatCurrencyWhole(compounded20yr)} over 20 years at 7% growth`,
+    difficulty: 'easy',
+    estimatedMinutes: 10,
+    status: 'pending',
+  };
+}
+
+// --- Stabilization Generators (30-day, medium) ---
+
+// --- Generator 5: TSP Match → Stabilization (large gap > 3%) ---
+
+function generateTspStabilizationAction(
+  finding: RiskFinding,
+  state: FinancialState,
+): Action | null {
+  if (state.military.retirementSystem !== 'brs') return null;
+  const { basePay } = state.income;
+  if (basePay === 0) return null;
+
+  const pct = state.deductions.tspContributionPct;
+  const gap = 0.05 - pct;
+
+  // Only stabilization tier when gap > 3% (i.e. below 2%)
+  if (gap <= 0.03) return null;
+
+  const annualMatch = Math.round(basePay * 12 * 0.05);
+  const compounded20yr = Math.round(annualMatch * ((Math.pow(1.07, 20) - 1) / 0.07));
+  const deadline = getDeadlineFromNow(30);
+
+  return {
+    id: `action_tsp_stabilization_${finding.id}`,
+    riskFindingId: finding.id,
+    title: 'Gradually increase TSP contribution to 5%',
+    description:
+      `You're contributing ${(pct * 100).toFixed(1)}% to TSP. Increase by 1% each month ` +
+      'until reaching 5% to capture the full BRS government match without a sudden budget impact.',
+    mechanism:
+      'myPay > TSP Contributions > Increase by 1% each month until reaching 5%',
+    amount: Math.round(basePay * gap),
+    deadline: `Before ${deadline}`,
+    estimatedImpact:
+      `Full 5% match captures up to ${formatCurrencyWhole(annualMatch)}/year, ` +
+      `potentially growing to ${formatCurrencyWhole(compounded20yr)} over 20 years at 7% growth`,
+    difficulty: 'medium',
+    estimatedMinutes: 15,
+    status: 'pending',
+  };
+}
+
+// --- Generator 6: SCRA Opportunity → Formal SCRA Letter ---
+
+function generateScraStabilizationAction(
+  finding: RiskFinding,
+  state: FinancialState,
+): Action | null {
+  const monthlySavings = state.risk.scraOpportunity;
+  if (monthlySavings === 0) return null;
+
+  const scraDebts = state.debts.filter((d) => d.preService && d.apr > 6);
+  if (scraDebts.length === 0) return null;
+
+  const annualSavings = Math.round(monthlySavings * 12);
+  const deadline = getDeadlineFromNow(30);
+
+  return {
+    id: `action_scra_formal_${finding.id}`,
+    riskFindingId: finding.id,
+    title: 'Request SCRA rate reduction from lenders',
+    description:
+      `You have ${scraDebts.length} pre-service debt${scraDebts.length !== 1 ? 's' : ''} ` +
+      'eligible for SCRA protection. Send formal requests with active-duty orders to each ' +
+      'lender via certified mail and follow up after 30 days.',
+    mechanism:
+      'Gather active-duty orders > Draft SCRA request letter > ' +
+      'Send to each lender via certified mail > Follow up after 30 days',
+    amount: annualSavings,
+    deadline: `Before ${deadline}`,
+    estimatedImpact:
+      `Saves ${formatCurrencyWhole(monthlySavings)}/month ` +
+      `(${formatCurrencyWhole(annualSavings)}/year) in interest charges`,
+    difficulty: 'medium',
+    estimatedMinutes: 45,
+    status: 'pending',
+  };
+}
+
+// --- Generator 7: High-Interest Debt → Consolidation Assistance ---
+
+function generateDebtConsolidationAction(
+  finding: RiskFinding,
+  _state: FinancialState,
+): Action | null {
+  const deadline = getDeadlineFromNow(30);
+
+  return {
+    id: `action_debt_consolidation_${finding.id}`,
+    riskFindingId: finding.id,
+    title: 'Contact NMCRS/AFAS for debt consolidation assistance',
+    description:
+      'Military relief societies offer interest-free loans and debt management programs. ' +
+      'Contact Navy-Marine Corps Relief Society (NMCRS), Air Force Aid Society (AFAS), ' +
+      'or Army Emergency Relief (AER) based on your branch.',
+    mechanism:
+      'Military OneSource > Financial Assistance > NMCRS (Navy/Marines) or ' +
+      'AFAS (Air Force/Space Force) or AER (Army) > Apply for debt management plan',
+    amount: undefined,
+    deadline: `Before ${deadline}`,
+    estimatedImpact:
+      'Interest-free consolidation loan can significantly reduce monthly debt payments ' +
+      'and accelerate payoff timeline',
+    difficulty: 'medium',
+    estimatedMinutes: 30,
+    status: 'pending',
+  };
+}
+
+// --- Generator 8: DTI → Debt Payoff Strategy (30–50%) ---
+
+function generateDtiStabilizationAction(
+  finding: RiskFinding,
+  state: FinancialState,
+): Action | null {
+  const dti = state.risk.debtToIncomeRatio;
+  const gross = state.income.totalGross;
+
+  // Only stabilization tier for DTI 30–50%
+  if (dti <= 0.30 || gross === 0) return null;
+
+  const monthlyDebt = Math.round(dti * gross);
+  const deadline = getDeadlineFromNow(30);
+
+  return {
+    id: `action_dti_strategy_${finding.id}`,
+    riskFindingId: finding.id,
+    title: 'Create debt payoff priority plan',
+    description:
+      `Your debt-to-income ratio is ${(dti * 100).toFixed(0)}%. ` +
+      'Use the avalanche method (highest APR first) or snowball method ' +
+      '(smallest balance first) to systematically reduce debt payments.',
+    mechanism:
+      'List all debts by APR > Allocate extra payment to highest-APR debt > ' +
+      'Set up automatic payments > Review monthly',
+    amount: monthlyDebt,
+    deadline: `Before ${deadline}`,
+    estimatedImpact:
+      `Reducing DTI below 30% frees up ${formatCurrencyWhole(monthlyDebt - Math.round(gross * 0.30))}/month ` +
+      'and strengthens security clearance posture',
+    difficulty: 'medium',
+    estimatedMinutes: 30,
+    status: 'pending',
+  };
+}
+
+// --- Compounding Generators (90-day, hard) ---
+
+// --- Generator 9: DTI → Professional Counseling (> 40%) ---
+
+function generateDtiCompoundingAction(
+  finding: RiskFinding,
+  state: FinancialState,
+): Action | null {
+  const dti = state.risk.debtToIncomeRatio;
+
+  // Only compounding tier for DTI > 40%
+  if (dti <= 0.40) return null;
+
+  const deadline = getDeadlineFromNow(90);
+
+  return {
+    id: `action_dti_counseling_${finding.id}`,
+    riskFindingId: finding.id,
+    title: 'Schedule appointment with installation PFC',
+    description:
+      `Your debt-to-income ratio of ${(dti * 100).toFixed(0)}% indicates a need for professional ` +
+      'financial counseling. Personal Financial Counselors (PFCs) at your installation provide ' +
+      'free, confidential debt management assistance. This also proactively protects your security clearance.',
+    mechanism:
+      'Military OneSource (800-342-9647) > Request PFC referral > ' +
+      'Schedule appointment > Bring full debt documentation',
+    amount: undefined,
+    deadline: `Before ${deadline}`,
+    estimatedImpact:
+      'Professional debt management plan can reduce DTI by 10–15% within 12 months ' +
+      'and demonstrates proactive financial responsibility for clearance reviews',
+    difficulty: 'hard',
+    estimatedMinutes: 60,
+    status: 'pending',
+  };
+}
+
+// --- Generator registries ---
+
+const IMMEDIATE_GENERATORS: Partial<Record<RiskCategory, ActionGenerator>> = {
   emergency_fund: generateEmergencyFundAction,
   high_interest_debt: generateHighInterestDebtAction,
   sgli_coverage: generateSgliAction,
+  tsp_match: generateTspImmediateAction,
 };
+
+const STABILIZATION_GENERATORS: Partial<Record<RiskCategory, ActionGenerator>> = {
+  tsp_match: generateTspStabilizationAction,
+  scra_opportunity: generateScraStabilizationAction,
+  high_interest_debt: generateDebtConsolidationAction,
+  debt_to_income: generateDtiStabilizationAction,
+};
+
+const COMPOUNDING_GENERATORS: Partial<Record<RiskCategory, ActionGenerator>> = {
+  debt_to_income: generateDtiCompoundingAction,
+};
+
+// --- Collection helper ---
+
+/**
+ * Collect up to `max` actions from a tier's generators, iterating findings
+ * in priority order (most impactful first, as sorted by the risk engine).
+ */
+function collectTierActions(
+  findings: RiskFinding[],
+  state: FinancialState,
+  generators: Partial<Record<RiskCategory, ActionGenerator>>,
+  max: number,
+): Action[] {
+  const actions: Action[] = [];
+  for (const finding of findings) {
+    if (actions.length >= max) break;
+    const generator = generators[finding.category];
+    if (!generator) continue;
+    const action = generator(finding, state);
+    if (action) actions.push(action);
+  }
+  return actions;
+}
 
 // --- Public API ---
 
@@ -233,30 +517,16 @@ const GENERATORS: Partial<Record<RiskCategory, ActionGenerator>> = {
  * Generate an action plan from the current financial state and risk assessment.
  * Pure function — safe to memoize with useMemo.
  *
- * Phase 0: populates immediate tier only (7-day, easy actions). Max 3 actions.
+ * Populates all 3 tiers (immediate/stabilization/compounding), max 3 actions each.
  * Iterates findings sorted by impact (from risk engine) for priority ordering.
  */
 export function generateActionPlan(
   state: FinancialState,
   risk: RiskAssessment,
 ): ActionPlan {
-  const immediate: Action[] = [];
-
-  for (const finding of risk.findings) {
-    if (immediate.length >= MAX_IMMEDIATE_ACTIONS) break;
-
-    const generator = GENERATORS[finding.category];
-    if (!generator) continue;
-
-    const action = generator(finding, state);
-    if (action) {
-      immediate.push(action);
-    }
-  }
-
   return {
-    immediate,
-    stabilization: [],
-    compounding: [],
+    immediate: collectTierActions(risk.findings, state, IMMEDIATE_GENERATORS, MAX_TIER_ACTIONS),
+    stabilization: collectTierActions(risk.findings, state, STABILIZATION_GENERATORS, MAX_TIER_ACTIONS),
+    compounding: collectTierActions(risk.findings, state, COMPOUNDING_GENERATORS, MAX_TIER_ACTIONS),
   };
 }
