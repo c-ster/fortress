@@ -329,13 +329,17 @@
   - **Test:** 500 iter / 480 months completes < 5s. Higher TSP % -> better median TSP at all horizons.
   - **Depends on:** 0.3.1
 
-- [ ] **1.4.2 Debt payoff strategies**
+- [x] **1.4.2 Debt payoff strategies**
+  - Implemented in 1.4.1: `client/src/simulation/debt-strategies.ts` with minimum/avalanche/snowball strategies.
   - **Depends on:** 1.4.1
 
-- [ ] **1.4.3 Percentile aggregation & milestones**
+- [x] **1.4.3 Percentile aggregation & milestones**
+  - Implemented in 1.4.1: `client/src/simulation/aggregation.ts` + milestone detection in `simulator.ts`.
   - **Depends on:** 1.4.1
 
-- [ ] **1.4.4 Comparison engine**
+- [x] **1.4.4 Comparison engine**
+  - `client/src/simulation/comparison.ts`: paired Monte Carlo comparison with delta snapshots at years 1/5/10/20, interest saved, debt-free months earlier, additional TSP.
+  - Worker extended to handle 'compare' messages. 9 tests in `comparison.test.ts`.
   - **Depends on:** 1.4.3
 
 - [ ] **1.4.5 Simulator chart (D3.js)**
