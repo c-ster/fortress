@@ -417,7 +417,7 @@
 - [x] **3.1.2 New child playbook** — Depends on: 0.3.1, 0.3.6
 
 ### 3.2 Black Box
-- [ ] **3.2.1 Black Box encryption & endpoints** — Depends on: 0.3.4
+- [x] **3.2.1 Black Box encryption & endpoints** — Depends on: 0.3.4
 - [ ] **3.2.2 Black Box UI** — Depends on: 3.2.1
 
 ### 3.3 Security Hardening

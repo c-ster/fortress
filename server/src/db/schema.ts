@@ -77,6 +77,27 @@ export const homefrontGrants = identitySchema.table('homefront_grants', {
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
+// Tier 5: Black Box — encrypted emergency sheet for next-of-kin
+export const blackBoxSnapshots = financialSchema.table('black_box_snapshots', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id')
+    .notNull()
+    .unique()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  ciphertext: bytea('ciphertext').notNull(),
+  iv: bytea('iv').notNull(),
+  authTag: bytea('auth_tag').notNull(),
+  salt: bytea('salt').notNull(),
+  iterations: integer('iterations').notNull(),
+  schemaVersion: integer('schema_version').notNull().default(1),
+  contactName: text('contact_name'),
+  contactEmail: text('contact_email'),
+  accessTokenHash: text('access_token_hash'),
+  expiresAt: timestamp('expires_at', { withTimezone: true }),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
 // Email verification codes
 export const verificationCodes = identitySchema.table('verification_codes', {
   id: uuid('id').primaryKey().defaultRandom(),

@@ -4,7 +4,7 @@
  */
 
 import { jsPDF } from 'jspdf';
-import type { PdfContent, PdfFinding, PdfActionTier, PdfSnapshotRow } from '../engine/pdf-generator';
+import type { PdfContent, PdfFinding, PdfActionTier } from '../engine/pdf-generator';
 
 // --- Layout constants ---
 

@@ -8,3 +8,4 @@ export * from './pcs';
 export * from './deployment';
 export * from './transition';
 export * from './new-child';
+export * from './black-box';
