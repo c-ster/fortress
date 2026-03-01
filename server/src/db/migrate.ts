@@ -59,6 +59,21 @@ async function migrate() {
       )
     `);
 
+    // Tier 4: Identity — device fingerprints for zero-trust tracking
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS identity.devices (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id UUID NOT NULL REFERENCES identity.users(id) ON DELETE CASCADE,
+        fingerprint_hash TEXT NOT NULL,
+        label TEXT,
+        last_ip TEXT,
+        last_used_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        trusted BOOLEAN NOT NULL DEFAULT FALSE,
+        UNIQUE(user_id, fingerprint_hash)
+      )
+    `);
+
     // Tier 2: Encrypted financial data — server never decrypts
     await client.query(`
       CREATE TABLE IF NOT EXISTS financial.encrypted_snapshots (
@@ -85,6 +100,9 @@ async function migrate() {
     `);
     await client.query(`
       CREATE INDEX IF NOT EXISTS idx_encrypted_snapshots_user_id ON financial.encrypted_snapshots(user_id)
+    `);
+    await client.query(`
+      CREATE INDEX IF NOT EXISTS idx_devices_user_id ON identity.devices(user_id)
     `);
 
     await client.query('COMMIT');

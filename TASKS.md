@@ -421,7 +421,7 @@
 - [x] **3.2.2 Black Box UI** — Depends on: 3.2.1
 
 ### 3.3 Security Hardening
-- [ ] **3.3.1 Device fingerprinting** — Depends on: 0.2.3
+- [x] **3.3.1 Device fingerprinting** — Depends on: 0.2.3
 - [ ] **3.3.2 Session hardening** — Depends on: 0.2.1
 - [ ] **3.3.3 Immutable audit logging** — Depends on: 0.1.3
 

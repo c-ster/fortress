@@ -98,6 +98,20 @@ export const blackBoxSnapshots = financialSchema.table('black_box_snapshots', {
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
+// Device fingerprints for zero-trust device tracking
+export const devices = identitySchema.table('devices', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  fingerprintHash: text('fingerprint_hash').notNull(),
+  label: text('label'),
+  lastIp: text('last_ip'),
+  lastUsedAt: timestamp('last_used_at', { withTimezone: true }).notNull().defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  trusted: boolean('trusted').notNull().default(false),
+});
+
 // Email verification codes
 export const verificationCodes = identitySchema.table('verification_codes', {
   id: uuid('id').primaryKey().defaultRandom(),

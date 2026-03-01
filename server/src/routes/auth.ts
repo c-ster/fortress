@@ -15,6 +15,12 @@ import { authRateLimitConfig } from '../middleware/rate-limit.js';
 import { auditLog } from '../middleware/audit-log.js';
 import { sendEmail, generateVerificationCode } from '../services/email.js';
 import { generateMfaSecret, verifyMfaToken } from '../services/mfa.js';
+import {
+  getFingerprint,
+  registerDevice,
+  handleDeviceCheck,
+  trustDevice,
+} from '../services/device.js';
 
 interface AuthenticatedRequest {
   user: JwtPayload;
@@ -45,7 +51,16 @@ export async function authRoutes(app: FastifyInstance) {
         .values({ email, passwordHash })
         .returning({ id: users.id, email: users.email });
 
-      auditLog('register', request, { userId: user.id });
+      // Register device as trusted (registering device is implicitly trusted)
+      const fingerprint = getFingerprint(request);
+      if (fingerprint) {
+        await registerDevice(
+          user.id, fingerprint, request.ip,
+          request.headers['user-agent'] ?? '', true,
+        );
+      }
+
+      auditLog('register', request, { userId: user.id, deviceFingerprint: fingerprint });
 
       const accessToken = signAccessToken({
         userId: user.id,
@@ -95,16 +110,37 @@ export async function authRoutes(app: FastifyInstance) {
         return reply.status(401).send({ error: 'Unauthorized', message: 'Invalid credentials' });
       }
 
+      // Device fingerprint check
+      const deviceResult = await handleDeviceCheck(user.id, request);
+
       if (user.mfaEnabled) {
         const tempToken = signAccessToken({
           userId: user.id,
           email: user.email,
           mfaVerified: false,
         });
-        return reply.send({ requiresMfa: true, accessToken: tempToken, expiresIn: 900 });
+        auditLog('login_mfa_pending', request, {
+          userId: user.id,
+          newDevice: deviceResult.isNew,
+        });
+        return reply.send({
+          requiresMfa: true,
+          accessToken: tempToken,
+          expiresIn: 900,
+          knownDevice: !deviceResult.isNew,
+        });
       }
 
-      auditLog('login', request, { userId: user.id });
+      // No MFA — auto-trust new devices
+      if (deviceResult.isNew) {
+        const fp = getFingerprint(request);
+        if (fp) await trustDevice(user.id, fp);
+      }
+
+      auditLog('login', request, {
+        userId: user.id,
+        newDevice: deviceResult.isNew,
+      });
 
       const accessToken = signAccessToken({
         userId: user.id,
@@ -128,7 +164,11 @@ export async function authRoutes(app: FastifyInstance) {
         maxAge: 7 * 24 * 60 * 60,
       });
 
-      return reply.send({ accessToken, expiresIn: 900 });
+      return reply.send({
+        accessToken,
+        expiresIn: 900,
+        ...(deviceResult.isNew && { newDevice: true }),
+      });
     },
   );
 
@@ -172,6 +212,9 @@ export async function authRoutes(app: FastifyInstance) {
     if (!user) {
       return reply.status(401).send({ error: 'Unauthorized', message: 'User not found' });
     }
+
+    // Track device on session refresh
+    await handleDeviceCheck(user.id, request);
 
     const accessToken = signAccessToken({
       userId: user.id,
@@ -313,13 +356,22 @@ export async function authRoutes(app: FastifyInstance) {
           .where(eq(users.id, user.userId));
       }
 
+      // Trust device after successful MFA verification
+      const fingerprint = getFingerprint(request);
+      if (fingerprint) {
+        await trustDevice(user.userId, fingerprint);
+      }
+
       const accessToken = signAccessToken({
         userId: user.userId,
         email: user.email,
         mfaVerified: true,
       });
 
-      auditLog('mfa_verified', request, { userId: user.userId });
+      auditLog('mfa_verified', request, {
+        userId: user.userId,
+        deviceFingerprint: fingerprint,
+      });
       return reply.send({ accessToken, expiresIn: 900 });
     },
   );

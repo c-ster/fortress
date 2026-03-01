@@ -1,6 +1,30 @@
 import { create } from 'zustand';
 import { config } from '../config';
 import { clearPassphrase } from '../crypto/passphrase-cache';
+import { generateFingerprint } from '../utils/device-fingerprint';
+
+// Module-level cached fingerprint (generated once per page load)
+let cachedFingerprint: string | null = null;
+async function getDeviceFingerprint(): Promise<string | null> {
+  try {
+    if (!cachedFingerprint) {
+      cachedFingerprint = await generateFingerprint();
+    }
+    return cachedFingerprint;
+  } catch {
+    return null; // Graceful degradation — fingerprint unavailable
+  }
+}
+
+/** Build headers with optional device fingerprint. */
+async function fingerprintHeaders(
+  extra: Record<string, string> = {},
+): Promise<Record<string, string>> {
+  const fp = await getDeviceFingerprint();
+  const headers: Record<string, string> = { ...extra };
+  if (fp) headers['X-Device-Fingerprint'] = fp;
+  return headers;
+}
 
 interface UserInfo {
   id: string;
@@ -75,9 +99,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   login: async (email: string, password: string): Promise<LoginResult> => {
     set({ isLoading: true, error: null, requiresMfa: false });
     try {
+      const headers = await fingerprintHeaders({ 'Content-Type': 'application/json' });
       const res = await fetch(`${config.apiUrl}/auth/login`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         credentials: 'include',
         body: JSON.stringify({ email, password }),
       });
@@ -123,9 +148,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   register: async (email: string, password: string): Promise<boolean> => {
     set({ isLoading: true, error: null });
     try {
+      const headers = await fingerprintHeaders({ 'Content-Type': 'application/json' });
       const res = await fetch(`${config.apiUrl}/auth/register`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         credentials: 'include',
         body: JSON.stringify({ email, password }),
       });
@@ -172,8 +198,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       set({ isLoading: true });
     }
     try {
+      const headers = await fingerprintHeaders();
       const res = await fetch(`${config.apiUrl}/auth/session`, {
         method: 'POST',
+        headers,
         credentials: 'include',
       });
 
@@ -207,12 +235,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
     set({ isLoading: true, error: null });
     try {
+      const headers = await fingerprintHeaders({
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      });
       const res = await fetch(`${config.apiUrl}/auth/mfa/verify`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`,
-        },
+        headers,
         credentials: 'include',
         body: JSON.stringify({ token }),
       });
