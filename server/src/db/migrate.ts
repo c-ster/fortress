@@ -98,6 +98,23 @@ async function migrate() {
         ADD COLUMN IF NOT EXISTS last_used_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     `);
 
+    // Immutable audit log with hash chaining
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS identity.audit_logs (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        sequence INTEGER NOT NULL,
+        user_id TEXT,
+        event TEXT NOT NULL,
+        ip TEXT,
+        user_agent TEXT,
+        device_fingerprint TEXT,
+        details TEXT,
+        previous_hash TEXT,
+        entry_hash TEXT NOT NULL,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )
+    `);
+
     // Indexes
     await client.query(`
       CREATE INDEX IF NOT EXISTS idx_refresh_tokens_user_id ON identity.refresh_tokens(user_id)
@@ -110,6 +127,15 @@ async function migrate() {
     `);
     await client.query(`
       CREATE INDEX IF NOT EXISTS idx_devices_user_id ON identity.devices(user_id)
+    `);
+    await client.query(`
+      CREATE INDEX IF NOT EXISTS idx_audit_logs_user_id ON identity.audit_logs(user_id)
+    `);
+    await client.query(`
+      CREATE INDEX IF NOT EXISTS idx_audit_logs_event ON identity.audit_logs(event)
+    `);
+    await client.query(`
+      CREATE INDEX IF NOT EXISTS idx_audit_logs_created_at ON identity.audit_logs(created_at)
     `);
 
     await client.query('COMMIT');

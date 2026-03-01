@@ -114,6 +114,21 @@ export const devices = identitySchema.table('devices', {
   trusted: boolean('trusted').notNull().default(false),
 });
 
+// Immutable audit log with hash chaining for tamper evidence
+export const auditLogs = identitySchema.table('audit_logs', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  sequence: integer('sequence').notNull(),
+  userId: text('user_id'), // text (not UUID FK) — survives user deletion
+  event: text('event').notNull(),
+  ip: text('ip'),
+  userAgent: text('user_agent'),
+  deviceFingerprint: text('device_fingerprint'),
+  details: text('details'), // JSON-serialized
+  previousHash: text('previous_hash'), // SHA-256 of prior entry (chain link)
+  entryHash: text('entry_hash').notNull(), // SHA-256 of this entry
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
 // Email verification codes
 export const verificationCodes = identitySchema.table('verification_codes', {
   id: uuid('id').primaryKey().defaultRandom(),
