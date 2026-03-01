@@ -56,10 +56,10 @@ export function DeploymentInputForm({
           />
 
           <div>
-            <label className="block text-sm font-medium text-fortress-slate mb-2">
+            <span id="spouse-label" className="block text-sm font-medium text-fortress-slate mb-2">
               Spouse Managing Finances?
-            </label>
-            <div className="flex gap-2">
+            </span>
+            <div className="flex gap-2" role="group" aria-labelledby="spouse-label">
               <button
                 type="button"
                 onClick={() => onUpdate({ hasSpouse: true })}

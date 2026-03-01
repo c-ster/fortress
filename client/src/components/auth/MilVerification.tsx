@@ -133,6 +133,7 @@ export function MilVerification() {
           pattern="[0-9]{6}"
           maxLength={6}
           required
+          // eslint-disable-next-line jsx-a11y/no-autofocus
           autoFocus
           value={code}
           onChange={(e) => {

@@ -121,11 +121,11 @@ export function BlackBoxPage() {
 
       {/* Access token modal */}
       {generatedToken && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" role="dialog" aria-modal="true" aria-labelledby="blackbox-token-title">
           <div className="bg-white rounded-xl shadow-lg max-w-md w-full p-6">
             <div className="text-center mb-4">
-              <span className="text-3xl">&#128272;</span>
-              <h3 className="text-lg font-bold text-fortress-navy mt-2">
+              <span className="text-3xl" aria-hidden="true">&#128272;</span>
+              <h3 id="blackbox-token-title" className="text-lg font-bold text-fortress-navy mt-2">
                 Access Token Generated
               </h3>
               <p className="text-sm text-gray-500 mt-1">

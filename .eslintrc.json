@@ -17,5 +17,16 @@
     "@typescript-eslint/explicit-function-return-type": "off",
     "@typescript-eslint/no-explicit-any": "warn"
   },
-  "ignorePatterns": ["dist/", "node_modules/", "*.js"]
+  "ignorePatterns": ["dist/", "node_modules/", "*.js"],
+  "overrides": [
+    {
+      "files": ["client/src/**/*.tsx"],
+      "plugins": ["jsx-a11y"],
+      "extends": ["plugin:jsx-a11y/recommended"],
+      "rules": {
+        "jsx-a11y/no-redundant-roles": "warn",
+        "jsx-a11y/click-events-have-key-events": "warn"
+      }
+    }
+  ]
 }

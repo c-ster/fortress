@@ -19,7 +19,7 @@ export function RiskScore({ score, tier }: RiskScoreProps) {
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
       <div className="relative w-40 h-40 mx-auto">
-        <svg className="w-full h-full" viewBox="0 0 100 100">
+        <svg className="w-full h-full" viewBox="0 0 100 100" role="img" aria-label={`Financial readiness score: ${score} out of 100, status ${config.label}`}>
           {/* Background track */}
           <circle
             cx="50" cy="50" r={RADIUS}

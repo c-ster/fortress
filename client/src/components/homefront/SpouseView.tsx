@@ -102,6 +102,7 @@ export function SpouseView({ grant, onLoadSnapshot, onSaveSnapshot }: SpouseView
                 className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm
                   focus:border-fortress-navy focus:ring-1 focus:ring-fortress-navy outline-none"
                 placeholder="Enter passphrase"
+                // eslint-disable-next-line jsx-a11y/no-autofocus
                 autoFocus
               />
             </div>

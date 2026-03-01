@@ -51,17 +51,21 @@ export function PassphraseModal({
   const isSave = mode === 'save';
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center" role="dialog" aria-modal="true" aria-labelledby="passphrase-modal-title">
       {/* Backdrop */}
       <div
+        role="button"
+        tabIndex={-1}
+        aria-label="Close modal"
         className="absolute inset-0 bg-black/50"
         onClick={handleClose}
+        onKeyDown={(e) => { if (e.key === 'Escape') handleClose(); }}
       />
 
       {/* Modal */}
       <div className="relative bg-white rounded-lg shadow-xl border border-gray-200 p-6
         w-full max-w-md mx-4">
-        <h3 className="text-lg font-bold text-fortress-navy mb-1">
+        <h3 id="passphrase-modal-title" className="text-lg font-bold text-fortress-navy mb-1">
           {isSave ? 'Encrypt & Save Your Data' : 'Decrypt Your Data'}
         </h3>
         <p className="text-sm text-gray-500 mb-4">
@@ -82,6 +86,7 @@ export function PassphraseModal({
               id="passphrase"
               type="password"
               required
+              // eslint-disable-next-line jsx-a11y/no-autofocus
               autoFocus
               minLength={8}
               value={passphrase}

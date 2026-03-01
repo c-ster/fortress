@@ -71,11 +71,11 @@ export function ReferralModal({ state, assessment, actionPlan, onClose }: Referr
   );
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" role="dialog" aria-modal="true" aria-labelledby="referral-modal-title">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-fortress-navy">Email Summary to Counselor</h3>
+          <h3 id="referral-modal-title" className="text-lg font-semibold text-fortress-navy">Email Summary to Counselor</h3>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 text-xl leading-none"
