@@ -13,6 +13,8 @@ import { Dashboard } from './pages/Dashboard';
 import { SimulatorPage } from './pages/SimulatorPage';
 import { PcsPage } from './pages/PcsPage';
 import { DeploymentPage } from './pages/DeploymentPage';
+import { HomefrontPage } from './pages/HomefrontPage';
+import { AcceptInvitePage } from './pages/AcceptInvitePage';
 
 function Header() {
   const { isAuthenticated, user, logout } = useAuthStore();
@@ -56,6 +58,12 @@ function Header() {
                 className="text-sm text-gray-300 hover:text-white transition-colors"
               >
                 Deployment
+              </Link>
+              <Link
+                to="/homefront"
+                className="text-sm text-gray-300 hover:text-white transition-colors"
+              >
+                Homefront
               </Link>
               <Link
                 to="/settings"
@@ -179,6 +187,15 @@ export function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/homefront"
+            element={
+              <ProtectedRoute>
+                <HomefrontPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/homefront/accept" element={<AcceptInvitePage />} />
           <Route
             path="/settings"
             element={

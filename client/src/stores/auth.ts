@@ -35,6 +35,9 @@ interface AuthState {
   // MFA setup (settings)
   setupMfa: () => Promise<{ secret: string; uri: string } | null>;
   confirmMfa: (token: string) => Promise<boolean>;
+
+  // Set session directly (used by homefront accept flow)
+  setSession: (accessToken: string, user: UserInfo) => void;
 }
 
 /** Decode JWT payload (middle segment) without a library. */
@@ -320,6 +323,17 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     } catch {
       return null;
     }
+  },
+
+  setSession: (accessToken: string, user: UserInfo) => {
+    set({
+      accessToken,
+      user,
+      isAuthenticated: true,
+      isLoading: false,
+      error: null,
+      requiresMfa: false,
+    });
   },
 
   confirmMfa: async (token: string): Promise<boolean> => {

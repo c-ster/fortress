@@ -394,14 +394,14 @@
 
 ### 2.1 PCS Playbook
 - [x] **2.1.1 PCS calculator** — Depends on: 0.3.6, 0.4.1
-- [ ] **2.1.2 PCS UI (3-phase)** — Depends on: 2.1.1, 1.4.6
+- [x] **2.1.2 PCS UI (3-phase)** — Depends on: 2.1.1, 1.4.6
 
 ### 2.2 Deployment Playbook
-- [ ] **2.2.1 Deployment preparation module** — Depends on: 0.3.1
-- [ ] **2.2.2 Deployment UI** — Depends on: 2.2.1
+- [x] **2.2.1 Deployment preparation module** — Depends on: 0.3.1
+- [x] **2.2.2 Deployment UI** — Depends on: 2.2.1
 
 ### 2.3 Homefront Link
-- [ ] **2.3.1 Homefront server endpoints** — Depends on: 0.2.1
+- [x] **2.3.1 Homefront server endpoints** — Depends on: 0.2.1
 - [ ] **2.3.2 Spouse access UI** — Depends on: 2.3.1, 1.6.1
 
 ### 2.4 Counselor Referral
