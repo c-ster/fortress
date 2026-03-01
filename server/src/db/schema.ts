@@ -57,7 +57,9 @@ export const refreshTokens = identitySchema.table('refresh_tokens', {
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' }),
   tokenHash: text('token_hash').notNull(),
+  deviceFingerprint: text('device_fingerprint'),
   expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+  lastUsedAt: timestamp('last_used_at', { withTimezone: true }).notNull().defaultNow(),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
 

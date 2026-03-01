@@ -13,3 +13,9 @@ export const authRateLimitConfig = {
   timeWindow: '1 minute',
   keyGenerator: (request: { ip: string }) => request.ip,
 };
+
+export const sessionRateLimitConfig = {
+  max: config.rateLimit.session,
+  timeWindow: '1 minute',
+  keyGenerator: (request: { ip: string }) => request.ip,
+};

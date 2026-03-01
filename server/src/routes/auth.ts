@@ -11,7 +11,7 @@ import {
   requireAuth,
   type JwtPayload,
 } from '../middleware/auth.js';
-import { authRateLimitConfig } from '../middleware/rate-limit.js';
+import { authRateLimitConfig, sessionRateLimitConfig } from '../middleware/rate-limit.js';
 import { auditLog } from '../middleware/audit-log.js';
 import { sendEmail, generateVerificationCode } from '../services/email.js';
 import { generateMfaSecret, verifyMfaToken } from '../services/mfa.js';
@@ -21,6 +21,7 @@ import {
   handleDeviceCheck,
   trustDevice,
 } from '../services/device.js';
+import { isSessionActive } from '../services/session.js';
 
 interface AuthenticatedRequest {
   user: JwtPayload;
@@ -73,6 +74,7 @@ export async function authRoutes(app: FastifyInstance) {
       await db.insert(refreshTokens).values({
         userId: user.id,
         tokenHash: refreshHash,
+        deviceFingerprint: fingerprint,
         expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       });
 
@@ -80,7 +82,7 @@ export async function authRoutes(app: FastifyInstance) {
         httpOnly: true,
         secure: !app.listeningOrigin?.startsWith('http://localhost'),
         sameSite: 'strict',
-        path: '/auth/session',
+        path: '/auth',
         maxAge: 7 * 24 * 60 * 60,
       });
 
@@ -149,10 +151,12 @@ export async function authRoutes(app: FastifyInstance) {
       });
       const refresh = signRefreshToken(user.id);
       const refreshHash = crypto.createHash('sha256').update(refresh).digest('hex');
+      const fp = getFingerprint(request);
 
       await db.insert(refreshTokens).values({
         userId: user.id,
         tokenHash: refreshHash,
+        deviceFingerprint: fp,
         expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       });
 
@@ -160,7 +164,7 @@ export async function authRoutes(app: FastifyInstance) {
         httpOnly: true,
         secure: !app.listeningOrigin?.startsWith('http://localhost'),
         sameSite: 'strict',
-        path: '/auth/session',
+        path: '/auth',
         maxAge: 7 * 24 * 60 * 60,
       });
 
@@ -172,58 +176,126 @@ export async function authRoutes(app: FastifyInstance) {
     },
   );
 
-  // POST /auth/session (refresh)
-  app.post('/auth/session', async (request, reply) => {
+  // POST /auth/logout
+  app.post('/auth/logout', async (request, reply) => {
     const token = request.cookies.refreshToken;
-    if (!token) {
-      return reply.status(401).send({ error: 'Unauthorized', message: 'No refresh token' });
+    if (token) {
+      const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+      await db
+        .delete(refreshTokens)
+        .where(eq(refreshTokens.tokenHash, tokenHash));
     }
 
-    let payload: { userId: string };
-    try {
-      payload = verifyRefreshToken(token);
-    } catch {
-      return reply.status(401).send({ error: 'Unauthorized', message: 'Invalid refresh token' });
-    }
-
-    const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
-    const [stored] = await db
-      .select()
-      .from(refreshTokens)
-      .where(
-        and(
-          eq(refreshTokens.userId, payload.userId),
-          eq(refreshTokens.tokenHash, tokenHash),
-          gt(refreshTokens.expiresAt, new Date()),
-        ),
-      )
-      .limit(1);
-
-    if (!stored) {
-      return reply.status(401).send({ error: 'Unauthorized', message: 'Refresh token revoked' });
-    }
-
-    const [user] = await db
-      .select()
-      .from(users)
-      .where(eq(users.id, payload.userId))
-      .limit(1);
-
-    if (!user) {
-      return reply.status(401).send({ error: 'Unauthorized', message: 'User not found' });
-    }
-
-    // Track device on session refresh
-    await handleDeviceCheck(user.id, request);
-
-    const accessToken = signAccessToken({
-      userId: user.id,
-      email: user.email,
-      mfaVerified: !user.mfaEnabled,
+    reply.clearCookie('refreshToken', {
+      httpOnly: true,
+      secure: !app.listeningOrigin?.startsWith('http://localhost'),
+      sameSite: 'strict',
+      path: '/auth',
     });
 
-    return reply.send({ accessToken, expiresIn: 900 });
+    auditLog('logout', request, {});
+    return reply.send({ message: 'Logged out' });
   });
+
+  // POST /auth/session (refresh with token rotation)
+  app.post(
+    '/auth/session',
+    { config: { rateLimit: sessionRateLimitConfig } },
+    async (request, reply) => {
+      const token = request.cookies.refreshToken;
+      if (!token) {
+        return reply.status(401).send({ error: 'Unauthorized', message: 'No refresh token' });
+      }
+
+      let payload: { userId: string };
+      try {
+        payload = verifyRefreshToken(token);
+      } catch {
+        return reply.status(401).send({ error: 'Unauthorized', message: 'Invalid refresh token' });
+      }
+
+      const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+      const [stored] = await db
+        .select()
+        .from(refreshTokens)
+        .where(
+          and(
+            eq(refreshTokens.userId, payload.userId),
+            eq(refreshTokens.tokenHash, tokenHash),
+            gt(refreshTokens.expiresAt, new Date()),
+          ),
+        )
+        .limit(1);
+
+      if (!stored) {
+        return reply
+          .status(401)
+          .send({ error: 'Unauthorized', message: 'Refresh token revoked' });
+      }
+
+      // Device binding: if the stored token has a fingerprint, verify it matches
+      const currentFp = getFingerprint(request);
+      if (stored.deviceFingerprint && currentFp && stored.deviceFingerprint !== currentFp) {
+        // Fingerprint mismatch — possible token theft. Revoke.
+        await db.delete(refreshTokens).where(eq(refreshTokens.id, stored.id));
+        auditLog('session_fingerprint_mismatch', request, { userId: payload.userId });
+        return reply
+          .status(401)
+          .send({ error: 'Unauthorized', message: 'Device mismatch' });
+      }
+
+      // Idle timeout check
+      if (!isSessionActive(stored.lastUsedAt)) {
+        await db.delete(refreshTokens).where(eq(refreshTokens.id, stored.id));
+        auditLog('session_idle_timeout', request, { userId: payload.userId });
+        return reply
+          .status(401)
+          .send({ error: 'Session expired', message: 'Session idle timeout', idle: true });
+      }
+
+      const [user] = await db
+        .select()
+        .from(users)
+        .where(eq(users.id, payload.userId))
+        .limit(1);
+
+      if (!user) {
+        return reply.status(401).send({ error: 'Unauthorized', message: 'User not found' });
+      }
+
+      // Track device on session refresh
+      await handleDeviceCheck(user.id, request);
+
+      // Token rotation: delete old token, issue new one
+      await db.delete(refreshTokens).where(eq(refreshTokens.id, stored.id));
+
+      const newRefresh = signRefreshToken(user.id);
+      const newRefreshHash = crypto.createHash('sha256').update(newRefresh).digest('hex');
+
+      await db.insert(refreshTokens).values({
+        userId: user.id,
+        tokenHash: newRefreshHash,
+        deviceFingerprint: currentFp,
+        expiresAt: stored.expiresAt, // Keep original expiry window
+      });
+
+      reply.setCookie('refreshToken', newRefresh, {
+        httpOnly: true,
+        secure: !app.listeningOrigin?.startsWith('http://localhost'),
+        sameSite: 'strict',
+        path: '/auth',
+        maxAge: 7 * 24 * 60 * 60,
+      });
+
+      const accessToken = signAccessToken({
+        userId: user.id,
+        email: user.email,
+        mfaVerified: !user.mfaEnabled,
+      });
+
+      return reply.send({ accessToken, expiresIn: 900 });
+    },
+  );
 
   // POST /auth/verify-email (.mil verification)
   app.post('/auth/verify-email', { preHandler: [requireAuth] }, async (request, reply) => {

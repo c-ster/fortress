@@ -91,6 +91,13 @@ async function migrate() {
       )
     `);
 
+    // Add session hardening columns to refresh_tokens (idempotent)
+    await client.query(`
+      ALTER TABLE identity.refresh_tokens
+        ADD COLUMN IF NOT EXISTS device_fingerprint TEXT,
+        ADD COLUMN IF NOT EXISTS last_used_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    `);
+
     // Indexes
     await client.query(`
       CREATE INDEX IF NOT EXISTS idx_refresh_tokens_user_id ON identity.refresh_tokens(user_id)

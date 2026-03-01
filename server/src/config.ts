@@ -21,7 +21,9 @@ export const config = {
     provider: (process.env.EMAIL_PROVIDER || 'console') as 'console' | 'sendgrid' | 'ses',
     apiKey: process.env.EMAIL_API_KEY || '',
   },
+  sessionIdleTimeout: parseInt(process.env.SESSION_IDLE_TIMEOUT || '1800', 10), // 30 min default
   rateLimit: {
     auth: parseInt(process.env.RATE_LIMIT_AUTH || (env === 'development' ? '100' : '5'), 10),
+    session: parseInt(process.env.RATE_LIMIT_SESSION || '30', 10), // 30/min
   },
 } as const;

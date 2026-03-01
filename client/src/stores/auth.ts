@@ -181,6 +181,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   logout: () => {
+    // Fire-and-forget server-side logout (revoke refresh token)
+    fetch(`${config.apiUrl}/auth/logout`, {
+      method: 'POST',
+      credentials: 'include',
+    }).catch(() => {}); // Ignore errors — local logout always succeeds
+
     clearPassphrase();
     set({
       accessToken: null,
@@ -206,7 +212,21 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       });
 
       if (!res.ok) {
-        set({ isLoading: false });
+        // Check for idle timeout — silently log out
+        const body = await res.json().catch(() => ({}));
+        if (body.idle) {
+          clearPassphrase();
+          set({
+            accessToken: null,
+            user: null,
+            isAuthenticated: false,
+            isLoading: false,
+            error: null,
+            requiresMfa: false,
+          });
+        } else {
+          set({ isLoading: false });
+        }
         return false;
       }
 
