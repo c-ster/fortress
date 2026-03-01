@@ -426,6 +426,6 @@
 - [x] **3.3.3 Immutable audit logging** — Depends on: 0.1.3
 
 ### 3.4 Performance & Reliability
-- [ ] **3.4.1 PWA service worker** — Depends on: 0.3.5, 0.3.6
+- [x] **3.4.1 PWA service worker** — Depends on: 0.3.5, 0.3.6
 - [ ] **3.4.2 Load testing** — Depends on: all server tasks
 - [ ] **3.4.3 Accessibility audit** — Depends on: all UI tasks

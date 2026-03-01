@@ -9,6 +9,7 @@ import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { useAuthStore } from './stores/auth';
 import { useBahPrefetch } from './hooks/useBahPrefetch';
 import { useAutoSave } from './hooks/useAutoSave';
+import { useServiceWorker } from './hooks/useServiceWorker';
 import { Dashboard } from './pages/Dashboard';
 import { SimulatorPage } from './pages/SimulatorPage';
 import { PcsPage } from './pages/PcsPage';
@@ -129,6 +130,10 @@ export function App() {
 
   // Auto-save encrypted financial state (5s debounce)
   useAutoSave();
+
+  // PWA service worker registration
+  const { offlineReady, needRefresh, updateServiceWorker, dismissOfflineReady } =
+    useServiceWorker();
 
   return (
     <div className="min-h-screen">
@@ -253,6 +258,38 @@ export function App() {
           />
         </Routes>
       </main>
+
+      {/* PWA toast notifications */}
+      {(offlineReady || needRefresh) && (
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 bg-fortress-navy text-white
+          px-6 py-3 rounded-lg shadow-lg flex items-center gap-4 z-50"
+        >
+          {offlineReady && (
+            <>
+              <span className="text-sm">Fortress is ready for offline use</span>
+              <button
+                onClick={dismissOfflineReady}
+                className="text-xs bg-white/20 hover:bg-white/30 px-3 py-1 rounded
+                  transition-colors"
+              >
+                OK
+              </button>
+            </>
+          )}
+          {needRefresh && (
+            <>
+              <span className="text-sm">Update available</span>
+              <button
+                onClick={() => updateServiceWorker()}
+                className="text-xs bg-fortress-green hover:bg-fortress-green/90 px-3 py-1
+                  rounded transition-colors"
+              >
+                Refresh
+              </button>
+            </>
+          )}
+        </div>
+      )}
     </div>
   );
 }
