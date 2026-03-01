@@ -15,6 +15,7 @@ import { PcsPage } from './pages/PcsPage';
 import { DeploymentPage } from './pages/DeploymentPage';
 import { HomefrontPage } from './pages/HomefrontPage';
 import { AcceptInvitePage } from './pages/AcceptInvitePage';
+import { TransitionPage } from './pages/TransitionPage';
 
 function Header() {
   const { isAuthenticated, user, logout } = useAuthStore();
@@ -58,6 +59,12 @@ function Header() {
                 className="text-sm text-gray-300 hover:text-white transition-colors"
               >
                 Deployment
+              </Link>
+              <Link
+                to="/transition"
+                className="text-sm text-gray-300 hover:text-white transition-colors"
+              >
+                Transition
               </Link>
               <Link
                 to="/homefront"
@@ -192,6 +199,14 @@ export function App() {
             element={
               <ProtectedRoute>
                 <HomefrontPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/transition"
+            element={
+              <ProtectedRoute>
+                <TransitionPage />
               </ProtectedRoute>
             }
           />

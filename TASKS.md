@@ -413,7 +413,7 @@
 ## Phase 3: Hardening & Scale
 
 ### 3.1 Remaining Playbooks
-- [ ] **3.1.1 Transition playbook** — Depends on: 1.4.1, 0.3.1
+- [x] **3.1.1 Transition playbook** — Depends on: 1.4.1, 0.3.1
 - [ ] **3.1.2 New child playbook** — Depends on: 0.3.1, 0.3.6
 
 ### 3.2 Black Box
