@@ -7,3 +7,4 @@ export * from './check-ins';
 export * from './pcs';
 export * from './deployment';
 export * from './transition';
+export * from './new-child';

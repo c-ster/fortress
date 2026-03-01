@@ -414,7 +414,7 @@
 
 ### 3.1 Remaining Playbooks
 - [x] **3.1.1 Transition playbook** — Depends on: 1.4.1, 0.3.1
-- [ ] **3.1.2 New child playbook** — Depends on: 0.3.1, 0.3.6
+- [x] **3.1.2 New child playbook** — Depends on: 0.3.1, 0.3.6
 
 ### 3.2 Black Box
 - [ ] **3.2.1 Black Box encryption & endpoints** — Depends on: 0.3.4
