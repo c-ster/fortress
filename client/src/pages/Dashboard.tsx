@@ -21,11 +21,13 @@ import { CheckInCard } from '../components/dashboard/CheckInCard';
 import { TrajectoryCard } from '../components/dashboard/TrajectoryCard';
 import { CheckInHistory } from '../components/dashboard/CheckInHistory';
 import { SimulatorCta } from '../components/dashboard/SimulatorCta';
+import { ReferralModal } from '../components/dashboard/ReferralModal';
 import type { Action, ActionPlan, CheckIn, FinancialState, RiskAssessment } from '@fortress/types';
 
 export function Dashboard() {
   const { state, setActionStatus, recordCheckIn } = useFinancialStore();
   const checkInRef = useRef<HTMLDivElement>(null);
+  const [showReferral, setShowReferral] = useState(false);
 
   // --- Derived data ---
   const assessment = useMemo(() => calculateRiskScore(state), [state]);
@@ -186,7 +188,23 @@ export function Dashboard() {
           Update Financial Data
         </Link>
         <DownloadPdfButton state={state} assessment={assessment} actionPlan={actionPlan} />
+        <button
+          onClick={() => setShowReferral(true)}
+          className="border border-fortress-navy text-fortress-navy px-6 py-2.5
+            rounded-md text-sm font-medium hover:bg-fortress-navy/10 transition-colors"
+        >
+          Email to Counselor
+        </button>
       </div>
+
+      {showReferral && (
+        <ReferralModal
+          state={state}
+          assessment={assessment}
+          actionPlan={actionPlan}
+          onClose={() => setShowReferral(false)}
+        />
+      )}
     </div>
   );
 }

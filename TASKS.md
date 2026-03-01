@@ -402,11 +402,11 @@
 
 ### 2.3 Homefront Link
 - [x] **2.3.1 Homefront server endpoints** — Depends on: 0.2.1
-- [ ] **2.3.2 Spouse access UI** — Depends on: 2.3.1, 1.6.1
+- [x] **2.3.2 Spouse access UI** — Depends on: 2.3.1, 1.6.1
 
 ### 2.4 Counselor Referral
-- [ ] **2.4.1 Summary PDF generator** — Depends on: 0.4.1, 0.5.1
-- [ ] **2.4.2 Referral email** — Depends on: 2.4.1
+- [x] **2.4.1 Summary PDF generator** — Depends on: 0.4.1, 0.5.1
+- [x] **2.4.2 Referral email** — Depends on: 2.4.1
 
 ---
 
