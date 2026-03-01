@@ -1,8 +1,10 @@
-import { useMemo, useCallback, useRef } from 'react';
+import { useMemo, useCallback, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useFinancialStore } from '../stores/financial-state';
 import { calculateRiskScore } from '../engine/risk-engine';
 import { generateActionPlan, ACTION_PLAN_DISCLAIMER } from '../engine/action-generator';
+import { buildPdfContent } from '../engine/pdf-generator';
+import { downloadSummaryPdf } from '../services/pdf-renderer';
 import {
   isCheckInDue,
   getPendingCheckIn,
@@ -19,7 +21,7 @@ import { CheckInCard } from '../components/dashboard/CheckInCard';
 import { TrajectoryCard } from '../components/dashboard/TrajectoryCard';
 import { CheckInHistory } from '../components/dashboard/CheckInHistory';
 import { SimulatorCta } from '../components/dashboard/SimulatorCta';
-import type { Action, CheckIn } from '@fortress/types';
+import type { Action, ActionPlan, CheckIn, FinancialState, RiskAssessment } from '@fortress/types';
 
 export function Dashboard() {
   const { state, setActionStatus, recordCheckIn } = useFinancialStore();
@@ -175,7 +177,7 @@ export function Dashboard() {
       </div>
 
       {/* Footer links */}
-      <div className="flex gap-3">
+      <div className="flex flex-wrap gap-3">
         <Link
           to="/intake"
           className="border border-fortress-navy text-fortress-navy px-6 py-2.5
@@ -183,7 +185,44 @@ export function Dashboard() {
         >
           Update Financial Data
         </Link>
+        <DownloadPdfButton state={state} assessment={assessment} actionPlan={actionPlan} />
       </div>
     </div>
+  );
+}
+
+// --- PDF download button ---
+
+function DownloadPdfButton({
+  state,
+  assessment,
+  actionPlan,
+}: {
+  state: FinancialState;
+  assessment: RiskAssessment;
+  actionPlan: ActionPlan;
+}) {
+  const [downloading, setDownloading] = useState(false);
+
+  const handleDownload = async () => {
+    setDownloading(true);
+    try {
+      const content = buildPdfContent(state, assessment, actionPlan);
+      await downloadSummaryPdf(content);
+    } finally {
+      setDownloading(false);
+    }
+  };
+
+  return (
+    <button
+      onClick={handleDownload}
+      disabled={downloading}
+      className="border border-fortress-navy text-fortress-navy px-6 py-2.5
+        rounded-md text-sm font-medium hover:bg-fortress-navy/10
+        disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+    >
+      {downloading ? 'Generating...' : 'Download Summary PDF'}
+    </button>
   );
 }
