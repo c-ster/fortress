@@ -17,6 +17,8 @@ import { HomefrontPage } from './pages/HomefrontPage';
 import { AcceptInvitePage } from './pages/AcceptInvitePage';
 import { TransitionPage } from './pages/TransitionPage';
 import { NewChildPage } from './pages/NewChildPage';
+import { BlackBoxPage } from './pages/BlackBoxPage';
+import { BlackBoxAccessPage } from './pages/BlackBoxAccessPage';
 
 function Header() {
   const { isAuthenticated, user, logout } = useAuthStore();
@@ -78,6 +80,12 @@ function Header() {
                 className="text-sm text-gray-300 hover:text-white transition-colors"
               >
                 Homefront
+              </Link>
+              <Link
+                to="/blackbox"
+                className="text-sm text-gray-300 hover:text-white transition-colors"
+              >
+                Black Box
               </Link>
               <Link
                 to="/settings"
@@ -225,6 +233,15 @@ export function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/blackbox"
+            element={
+              <ProtectedRoute>
+                <BlackBoxPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/blackbox/access" element={<BlackBoxAccessPage />} />
           <Route path="/homefront/accept" element={<AcceptInvitePage />} />
           <Route
             path="/settings"

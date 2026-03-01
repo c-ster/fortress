@@ -418,7 +418,7 @@
 
 ### 3.2 Black Box
 - [x] **3.2.1 Black Box encryption & endpoints** — Depends on: 0.3.4
-- [ ] **3.2.2 Black Box UI** — Depends on: 3.2.1
+- [x] **3.2.2 Black Box UI** — Depends on: 3.2.1
 
 ### 3.3 Security Hardening
 - [ ] **3.3.1 Device fingerprinting** — Depends on: 0.2.3
