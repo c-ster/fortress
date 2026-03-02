@@ -2,6 +2,7 @@ import { FastifyInstance } from 'fastify';
 import argon2 from 'argon2';
 import crypto from 'crypto';
 import { eq, and, gt } from 'drizzle-orm';
+import { config } from '../config.js';
 import { db } from '../db/connection.js';
 import { users, refreshTokens, verificationCodes } from '../db/schema.js';
 import {
@@ -80,7 +81,7 @@ export async function authRoutes(app: FastifyInstance) {
 
       reply.setCookie('refreshToken', refresh, {
         httpOnly: true,
-        secure: !app.listeningOrigin?.startsWith('http://localhost'),
+        secure: !config.isDev,
         sameSite: 'strict',
         path: '/auth',
         maxAge: 7 * 24 * 60 * 60,
@@ -162,7 +163,7 @@ export async function authRoutes(app: FastifyInstance) {
 
       reply.setCookie('refreshToken', refresh, {
         httpOnly: true,
-        secure: !app.listeningOrigin?.startsWith('http://localhost'),
+        secure: !config.isDev,
         sameSite: 'strict',
         path: '/auth',
         maxAge: 7 * 24 * 60 * 60,
@@ -188,7 +189,7 @@ export async function authRoutes(app: FastifyInstance) {
 
     reply.clearCookie('refreshToken', {
       httpOnly: true,
-      secure: !app.listeningOrigin?.startsWith('http://localhost'),
+      secure: !config.isDev,
       sameSite: 'strict',
       path: '/auth',
     });
@@ -281,7 +282,7 @@ export async function authRoutes(app: FastifyInstance) {
 
       reply.setCookie('refreshToken', newRefresh, {
         httpOnly: true,
-        secure: !app.listeningOrigin?.startsWith('http://localhost'),
+        secure: !config.isDev,
         sameSite: 'strict',
         path: '/auth',
         maxAge: 7 * 24 * 60 * 60,

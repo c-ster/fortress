@@ -17,6 +17,7 @@ import { FastifyInstance } from 'fastify';
 import crypto from 'crypto';
 import argon2 from 'argon2';
 import { eq, and, isNull, isNotNull } from 'drizzle-orm';
+import { config } from '../config.js';
 import { db } from '../db/connection.js';
 import { users, homefrontGrants, encryptedSnapshots, refreshTokens } from '../db/schema.js';
 import { requireAuth, signAccessToken, signRefreshToken, type JwtPayload } from '../middleware/auth.js';
@@ -208,7 +209,7 @@ export async function homefrontRoutes(app: FastifyInstance) {
 
     reply.setCookie('refreshToken', refresh, {
       httpOnly: true,
-      secure: !app.listeningOrigin?.startsWith('http://localhost'),
+      secure: !config.isDev,
       sameSite: 'strict',
       path: '/auth/session',
       maxAge: 7 * 24 * 60 * 60,

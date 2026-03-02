@@ -5,5 +5,5 @@ export const config = {
   isDev: env === 'development',
   isTest: env === 'test',
   isProd: env === 'production',
-  apiUrl: import.meta.env.VITE_API_URL || 'http://localhost:3001',
+  apiUrl: import.meta.env.VITE_API_URL || (env === 'production' ? '/api' : 'http://localhost:3001'),
 } as const;
